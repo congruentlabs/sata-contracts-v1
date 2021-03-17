@@ -1,1 +1,1 @@
-# signata-ico-web
+# SATA Contracts v1
