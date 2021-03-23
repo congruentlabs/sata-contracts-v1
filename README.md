@@ -7,20 +7,33 @@ ERC20 token definition and the Airdrop contract for Eth accounts.
 
 More information about the SATA token can be found at: [sata.technology](https://sata.technology)
 
+Most of the initial contracts are derived from [OpenZeppelin](https://openzeppelin.com/). We've made
+most of our changes to support our use case.
+
+This repository will house the first suite of contracts that utilise the SATA token, including for
+the first releases of the IdGAF. The V1 moniker is just added to the name in case we make a drastic
+change and need to shift to a V2 later down the track (but we'll try to avoid that).
+
 ## Test
 
 ### Environment Setup
 
-Install truffle and the project dependencies:
+Install Node v12 on your machine. We develop on Windows but other platforms shouldn't be a problem.
+
+On Windows make sure you're using PowerShell (I'd recommend Windows Terminal).
+
+Install truffle globally and the project dependencies:
 
 ``` bash
 npm i -g truffle
 npm install
 ```
 
+Restart PowerShell as well, just to make sure Truffle is available on the system path.
+
 ### Running tests
 
-Just run the test script to compile and run the test suite:
+Just run the `test` script to compile and execute the test suite:
 
 ``` bash
 npm run test
