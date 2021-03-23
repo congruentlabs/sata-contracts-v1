@@ -27,9 +27,9 @@ contract SATAToken is ERC20, Ownable {
     _mint(msg.sender, remainderAmount);
   }
 
-  function mintAirdrop(address contractAddress) public onlyOwner {
+  function mintAirdrop(address contractAddress, uint256 airdropAmount) public onlyOwner { //10000000
     require(!airdropMinted, "Airdrop already minted.");
     airdropMinted = true;
-    _mint(contractAddress, 10000000);
+    _mint(contractAddress, airdropAmount);
   }
 }
