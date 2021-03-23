@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "truffle compile && mocha --exit --recursive",
-    "deploy-ropsten": "truffle deploy --network ropsten",
-    "deploy-mainnet": "truffle deploy --network mainnet"
+    "deploy-ropsten": "truffle migrate --network ropsten --reset",
+    "deploy-mainnet": "truffle migrate --network mainnet"
   },
   "repository": {
     "type": "git",

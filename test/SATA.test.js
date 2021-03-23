@@ -15,24 +15,24 @@ describe("Token Contract", function () {
       "Signata",
       "SATA",
       "0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0",
-      new BN("40000000"),
+      new BN("40000000000000000000000000"), // 40,000,000
       "0x22d491Bde2303f2f43325b2108D26f1eAbA1e32b",
-      new BN("10000000"),
-      new BN("40000000"),
+      new BN("10000000000000000000000000"), // 10,000,000
+      new BN("40000000000000000000000000"), // 40,000,000
       { from: owner })
     expect(await token.owner()).to.equal(owner);
   });
   
   it("mints the reserve address", async function() {
-    expect(await token.balanceOf("0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0")).to.be.bignumber.equal("40000000");
+    expect(await token.balanceOf("0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0")).to.be.bignumber.equal("40000000000000000000000000");
   });
 
   it("mints the integration address", async function() {
-    expect(await token.balanceOf("0x22d491Bde2303f2f43325b2108D26f1eAbA1e32b")).to.be.bignumber.equal("10000000");
+    expect(await token.balanceOf("0x22d491Bde2303f2f43325b2108D26f1eAbA1e32b")).to.be.bignumber.equal("10000000000000000000000000");
   });
 
   it("succesfully mints the remainder", async function() {
-    expect(await token.totalSupply()).to.be.bignumber.equal("90000000");
+    expect(await token.totalSupply()).to.be.bignumber.equal("90000000000000000000000000");
   });
 });
 
@@ -40,27 +40,27 @@ describe("Airdrop Contract", function () {
   it("deployer is owner", async function () {
     airdropContract = await SATAAirdropV1.new(
       token.address,
-      1000,
-      new BN("100000000000000000"),
+      new BN("1000000000000000000000"),
+      new BN("100000000000000000"), // 0.1 ETH
       { from: owner })
     expect(await airdropContract.owner()).to.equal(owner);
   });
 
   it("can mint the airdrop", async function() {
-    expect(await token.mintAirdrop(airdropContract.address, new BN("10000000"), { from: owner })).to.not.throw;
+    expect(await token.mintAirdrop(airdropContract.address, new BN("10000000000000000000000000"), { from: owner })).to.not.throw;
   });
 
   it("has minted the airdrop", async function() {
-    expect(await token.balanceOf(airdropContract.address)).to.be.bignumber.equal("10000000");
-    expect(await token.totalSupply()).to.be.bignumber.equal("100000000");
+    expect(await token.balanceOf(airdropContract.address)).to.be.bignumber.equal("10000000000000000000000000");
+    expect(await token.totalSupply()).to.be.bignumber.equal("100000000000000000000000000"); // 100,000,000
   });
 
   it("can retrieve the balance of the airdrop", async function() {
-    expect(await airdropContract.availableTokens()).to.be.bignumber.equal("10000000");
+    expect(await airdropContract.availableTokens()).to.be.bignumber.equal("10000000000000000000000000");
   });
 
   it("cannot mint the airdrop again", async function() {
-    await expectRevert(token.mintAirdrop(airdropContract.address, new BN("10000000"), { from: owner }), "Airdrop already minted.");
+    await expectRevert(token.mintAirdrop(airdropContract.address, new BN("10000000000000000000000000"), { from: owner }), "Airdrop already minted.");
   });
 
   it("can claim airdrop with a valid account", async function() {
@@ -90,7 +90,7 @@ describe("Airdrop Contract", function () {
       { from: owner }
     ), "Airdrop depleted.");
     expect(await token.balanceOf(airdropContract.address)).to.be.bignumber.equal("0");
-    expect(await token.balanceOf("0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0")).to.be.bignumber.equal("49999000");    
+    expect(await token.balanceOf("0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0")).to.be.bignumber.equal("49999000000000000000000000");    
   });
 
   it("cannot claim after airdrop depleted", async function() {
