@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "truffle compile && mocha --exit --recursive",
+    "analyze": "slither .",
     "deploy-ropsten": "truffle migrate --network ropsten --reset",
     "deploy-mainnet": "truffle migrate --network mainnet"
   },

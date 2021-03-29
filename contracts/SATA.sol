@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.7.4;
+pragma solidity 0.6.8;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -8,16 +8,16 @@ contract SATAToken is ERC20, Ownable {
   bool private airdropMinted = false;
 
   constructor(
-    string memory name,
-    string memory symbol,
+    string memory name_,
+    string memory symbol_,
     address reserveAddress,
     uint256 reserveAmount,
     address integrationAddress,
     uint256 integrationAmount,
     uint256 remainderAmount
   )
-    ERC20(name, symbol)
-    payable
+    ERC20(name_, symbol_)
+    public
   {
     // allocate the reserves
     _mint(reserveAddress, reserveAmount);
@@ -26,7 +26,7 @@ contract SATAToken is ERC20, Ownable {
     _mint(msg.sender, remainderAmount);
   }
 
-  function mintAirdrop(address contractAddress, uint256 airdropAmount) public onlyOwner { //10000000
+  function mintAirdrop(address contractAddress, uint256 airdropAmount) external onlyOwner {
     require(!airdropMinted, "Airdrop already minted.");
     airdropMinted = true;
     _mint(contractAddress, airdropAmount);
