@@ -1,4 +1,4 @@
-exports.pointOneEth        = "100000000000000000";
+exports.pointOneEth        = "70000000000000000";
 exports.ninePointNineOne   = "9910000000000000000";
 exports.tenThousand        = "10000000000000000000000";
 exports.tenMil             = "10000000000000000000000000";
