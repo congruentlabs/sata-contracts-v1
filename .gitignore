@@ -50,3 +50,4 @@ Thumbs.db
 
 .secret
 .infura
+.secret.prod

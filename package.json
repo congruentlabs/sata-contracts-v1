@@ -17,7 +17,7 @@
   "license": "MIT",
   "homepage": "https://github.com/congruentlabs/sata-contracts-v1#readme",
   "dependencies": {
-    "@openzeppelin/contracts": "^3.4.1"
+    "@openzeppelin/contracts": "^4.0.0"
   },
   "devDependencies": {
     "@openzeppelin/test-environment": "^0.1.9",
