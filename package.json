@@ -17,12 +17,12 @@
   "license": "MIT",
   "homepage": "https://github.com/congruentlabs/sata-contracts-v1#readme",
   "dependencies": {
-    "@openzeppelin/contracts": "^4.0.0"
+    "@openzeppelin/contracts": "^4.0.0",
+    "@truffle/hdwallet-provider": "^1.2.3"
   },
   "devDependencies": {
     "@openzeppelin/test-environment": "^0.1.9",
     "@openzeppelin/test-helpers": "^0.5.10",
-    "@truffle/hdwallet-provider": "^1.2.2",
     "chai": "^4.3.4",
     "mocha": "^8.3.2"
   }

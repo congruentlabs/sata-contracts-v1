@@ -3,7 +3,7 @@ const HDWalletProvider = require('@truffle/hdwallet-provider');
 const fs = require('fs');
 const testMnemonic = fs.readFileSync(".secret").toString().trim();
 const prodMnemonic = fs.readFileSync(".secret.prod").toString().trim();
-const infuraKey = fs.readFileSync(".infura").toString().trim();
+const infuraUrl = fs.readFileSync(".infura").toString().trim();
 
 module.exports = {
   /**
@@ -40,7 +40,7 @@ module.exports = {
     // Useful for deploying to a public network.
     // NB: It's important to wrap the provider as a function.
     ropsten: {
-      provider: () => new HDWalletProvider(testMnemonic, 'https://ropsten.infura.io/v3/' + {infuraKey}),
+      provider: () => new HDWalletProvider({ mnemonic: testMnemonic, providerOrUrl: infuraUrl }),
       network_id: 3,       // Ropsten's id
       gas: 5500000,        // Ropsten has a lower block limit than mainnet
       confirmations: 2,    // # of confs to wait between deployments. (default: 0)
@@ -48,7 +48,7 @@ module.exports = {
       skipDryRun: true     // Skip dry run before migrations? (default: false for public nets )
     },
     mainnet: {
-      provider: () => new HDWalletProvider(prodMnemonic, 'https://mainnet.infura.io/v3/' + {infuraKey}),
+      provider: () => new HDWalletProvider({ mnemonic: prodMnemonic, providerOrUrl: infuraUrl }),
       network_id: 1,       // Mainnet's id
       confirmations: 2,    // # of confs to wait between deployments. (default: 0)
       timeoutBlocks: 50,  // # of blocks before a deployment times out  (minimum/default: 50)

@@ -82,4 +82,8 @@ and truffle will execute the `migrations/` scripts.
 
 ### Mainnet
 
-TBC - but this will be the same as Ropsten but with more rigor and control over the executing wallet.
+Run:
+
+``` bash
+npm run deploy-mainnet
+```
