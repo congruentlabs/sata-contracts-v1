@@ -51,6 +51,7 @@ module.exports = {
       provider: () => new HDWalletProvider({ mnemonic: prodMnemonic, providerOrUrl: infuraUrl }),
       network_id: 1,       // Mainnet's id
       confirmations: 2,    // # of confs to wait between deployments. (default: 0)
+      gasPrice: 160000000000,
       timeoutBlocks: 50,  // # of blocks before a deployment times out  (minimum/default: 50)
       skipDryRun: false     // Skip dry run before migrations? (default: false for public nets )
     },

@@ -12,9 +12,10 @@ const {
 
 module.exports = function (deployer) {
   var sataTokenInst;
-  const reserveAddr        = "0xce95DAde44E7307bAA616C77EF446915633dD9Ab";
-  const intAddr            = "0xC34504f0195F00914a1A3b5Adf142b015F174125";
-  const contractAddr       = "0xc441601696DF5ce0922224248AD96AB956D3B1Ae";
+
+  const contractAddr       = "0x042fc4EA3F836e1Ea5Dc4Fb70ec90DeD51c09ECa";
+  const reserveAddr        = "0xd204ff1705AFFB1353F1f717D0486dccf3222473";
+  const intAddr            = "0xd2C55cbcA4FC0467fca2d49BFe114515c8854220";
 
   deployer.deploy(
     SATAToken,
