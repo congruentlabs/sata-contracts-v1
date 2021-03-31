@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.6.8;
+pragma solidity 0.8.3;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -17,7 +17,6 @@ contract SATAToken is ERC20, Ownable {
     uint256 remainderAmount
   )
     ERC20(name_, symbol_)
-    public
   {
     // allocate the reserves
     _mint(reserveAddress, reserveAmount);

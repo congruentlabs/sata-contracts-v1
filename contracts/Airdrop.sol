@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.6.8;
+pragma solidity 0.8.3;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -10,7 +10,7 @@ contract SATAAirdropV1 is Ownable {
   IERC20 public immutable token;
   mapping (address => bool) public claimedAddresses;
 
-  constructor(address _token, uint256 _airdropAmount, uint256 _minBalance) public {
+  constructor(address _token, uint256 _airdropAmount, uint256 _minBalance) {
     token = IERC20(_token);
     airdropAmount = _airdropAmount;
     reqEthBalance = _minBalance;
