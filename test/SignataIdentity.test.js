@@ -67,7 +67,7 @@ describe("Signata Identity Contract", function () {
     // expect(await idContract.owner()).to.equal(owner);
   });
 
-	it("can create the first identity", async function () {
+  it("can create the first identity", async function () {
     const inputHash = web3.utils.sha3(
       TXTYPE_CREATE_DIGEST
         + d1.slice(2).padStart(64, '0')
@@ -92,37 +92,37 @@ describe("Signata Identity Contract", function () {
       delegateKey: d1,
       securityKey: s1
     });
-	});
+  });
   
-	it("can get delegate for identity", async function () {
+  it("can get delegate for identity", async function () {
     expect(await idContract.getDelegate(i1, { from: i1 })).to.equal(d1);
-	});
+  });
   
-	it("cannot get delegate for invalid identity", async function () {
+  it("cannot get delegate for invalid identity", async function () {
     await expectRevert(idContract.getDelegate(i2, { from: i1 }), "SignataIdentity: The identity must exist.");
-	});
+  });
 
-	it("can get identity for delegate", async function () {
+  it("can get identity for delegate", async function () {
     expect(await idContract.getIdentity(d1, { from: i1 })).to.equal(i1);
-	});
+  });
 
-	it("cannot get identity for invalid delegate", async function () {
+  it("cannot get identity for invalid delegate", async function () {
     await expectRevert(idContract.getIdentity(d2, { from: i1 }), "SignataIdentity: The delegate key provided is not linked to an existing identity.");
-	});
+  });
   
-	it("is not locked", async function () {
+  it("is not locked", async function () {
     expect(await idContract.isLocked(i1, { from: i1 })).to.equal(false);
-	});
+  });
 
-	it("can get lock count of 0", async function () {
+  it("can get lock count of 0", async function () {
     expect(await idContract.getLockCount(i1, { from: i1 })).to.be.bignumber.equal(new BN(0));
-	});
+  });
 
-	it("can get rollover count of 0", async function () {
+  it("can get rollover count of 0", async function () {
     expect(await idContract.getRolloverCount(i1, { from: i1 })).to.be.bignumber.equal(new BN(0));
-	});
+  });
 
-	it("cannot create a duplicate identity", async function () {
+  it("cannot create a duplicate identity", async function () {
     const inputHash = web3.utils.sha3(
       TXTYPE_CREATE_DIGEST
         + d2.slice(2).padStart(64, '0')
@@ -141,9 +141,9 @@ describe("Signata Identity Contract", function () {
     );
 
     await expectRevert(idContract.create(v, r, s, d2, s2, { from: i1 }), "SignataIdentity: The identity must not already exist.");
-	});
+  });
 
-	it("cannot reuse a delegate key", async function () {
+  it("cannot reuse a delegate key", async function () {
     const inputHash = web3.utils.sha3(
       TXTYPE_CREATE_DIGEST
         + d1.slice(2).padStart(64, '0')
@@ -162,9 +162,9 @@ describe("Signata Identity Contract", function () {
     );
 
     await expectRevert(idContract.create(v, r, s, d1, s2, { from: i2 }), "SignataIdentity: Delegate key must not already be in use.");
-	});
+  });
   
-	it("must use distinct keys", async function () {
+  it("must use distinct keys", async function () {
     const inputHash = web3.utils.sha3(
       TXTYPE_CREATE_DIGEST
         + d2.slice(2).padStart(64, '0')
@@ -183,29 +183,29 @@ describe("Signata Identity Contract", function () {
     );
 
     await expectRevert(idContract.create(v, r, s, d2, d2, { from: i2 }), "SignataIdentity: Keys must be unique.");
-	});
+  });
 
-	it("cannot lock a nonexistant identity key", async function () {
+  it("cannot lock a nonexistant identity key", async function () {
     await expectRevert(idContract.lock(i2, { from: i2 }), "SignataIdentity: The identity must exist.");
-	});
+  });
 
-	it("cannot be locked with identity key", async function () {
+  it("cannot be locked with identity key", async function () {
     await expectRevert(idContract.lock(i1, { from: i1 }), "SignataIdentity: The sender is unauthorised to lock identity.");
-	});
+  });
   
-	it("can be locked with delegate key", async function () {
+  it("can be locked with delegate key", async function () {
     await expectEvent(await idContract.lock(i1, { from: d1 }), 'Lock', { identity: i1 });
-	});
+  });
 
-	it("is first identity locked", async function () {
+  it("is first identity locked", async function () {
     expect(await idContract.isLocked(i1, { from: i1 })).to.equal(true);
-	});
+  });
   
-	it("cannot be locked while already locked with delegate key", async function () {
+  it("cannot be locked while already locked with delegate key", async function () {
     await expectRevert(idContract.lock(i1, { from: d1 }), "SignataIdentity: The identity has already been locked.");
-	});
+  });
 
-	it("can destroy the first identity", async function () {
+  it("can destroy the first identity", async function () {
     const inputHash = web3.utils.sha3(TXTYPE_DESTROY_DIGEST, {encoding: 'hex'});
 
     const hashToSign = web3.utils.sha3(
@@ -245,13 +245,13 @@ describe("Signata Identity Contract", function () {
     await expectEvent(destroyReceipt, 'Destroy', {
       identity: i1
     });
-	});
+  });
 
-	it("cannot lock a destroyed identity", async function () {
+  it("cannot lock a destroyed identity", async function () {
     await expectRevert(idContract.lock(i1, { from: i1 }), "SignataIdentity: The identity has been destroyed.");
-	});
+  });
 
-	it("cannot unlock a destroyed identity", async function () {
+  it("cannot unlock a destroyed identity", async function () {
     // this signature is just for testing, we need value data types for the contract call
     const inputHash = web3.utils.sha3(
       TXTYPE_CREATE_DIGEST,
@@ -263,9 +263,9 @@ describe("Signata Identity Contract", function () {
     );
 
     await expectRevert(idContract.unlock(i1, v, r, s, v, r, s, { from: i1 }), "SignataIdentity: The identity has been destroyed.");
-	});
+  });
 
-	it("cannot destroy a destroyed identity", async function () {
+  it("cannot destroy a destroyed identity", async function () {
     // this signature is just for testing, we need value data types for the contract call
     const inputHash = web3.utils.sha3(
       TXTYPE_CREATE_DIGEST,
@@ -277,7 +277,7 @@ describe("Signata Identity Contract", function () {
     );
 
     await expectRevert(idContract.destroy(i1, v, r, s, v, r, s, { from: i1 }), "SignataIdentity: The identity has already been destroyed.");
-	});
+  });
 
   it("cannot rollover a destroyed identity", async function () {
     // this signature is just for testing, we need value data types for the contract call
@@ -291,25 +291,25 @@ describe("Signata Identity Contract", function () {
     );
 
     await expectRevert(idContract.rollover(i1, v, r, s, v, r, s, i1, i1, { from: i1 }), "SignataIdentity: The identity has been destroyed.");
-	});
+  });
 
-	it("cannot get delegate for a destroyed identity", async function () {
+  it("cannot get delegate for a destroyed identity", async function () {
     await expectRevert(idContract.getDelegate(i1, { from: i1 }), "SignataIdentity: The identity has been destroyed.");
-	});
+  });
 
-	it("cannot get lock count for a destroyed identity", async function () {
+  it("cannot get lock count for a destroyed identity", async function () {
     await expectRevert(idContract.getLockCount(i1, { from: i1 }), "SignataIdentity: The identity has been destroyed.");
-	});
+  });
 
-	it("cannot get rollover count for a destroyed identity", async function () {
+  it("cannot get rollover count for a destroyed identity", async function () {
     await expectRevert(idContract.getRolloverCount(i1, { from: i1 }), "SignataIdentity: The identity has been destroyed.");
-	});
+  });
   
-	it("cannot check is locked for a destroyed identity", async function () {
+  it("cannot check is locked for a destroyed identity", async function () {
     await expectRevert(idContract.isLocked(i1, { from: i1 }), "SignataIdentity: The identity has been destroyed.");
-	});
+  });
 
-	it("can create a second identity", async function () {
+  it("can create a second identity", async function () {
     const inputHash = web3.utils.sha3(
       TXTYPE_CREATE_DIGEST
         + d2.slice(2).padStart(64, '0')
@@ -334,23 +334,23 @@ describe("Signata Identity Contract", function () {
       delegateKey: d2,
       securityKey: s2
     });
-	});
+  });
 
   it("can lock second identity with security key", async function () {
     await expectEvent(await idContract.lock(i2, { from: s2 }), 'Lock', { identity: i2 });
-	});
+  });
 
-	it("is second identity locked", async function () {
+  it("is second identity locked", async function () {
     expect(await idContract.isLocked(i2, { from: i2 })).to.equal(true);
-	});
+  });
   
-	it("second identity lock count has incremented", async function () {
+  it("second identity lock count has incremented", async function () {
     expect(await idContract.getLockCount(i2, { from: i2 })).to.be.bignumber.equal(new BN(1));
-	});
+  });
   
-	it("cannot be locked while already locked with security key", async function () {
+  it("cannot be locked while already locked with security key", async function () {
     await expectRevert(idContract.lock(i2, { from: s2 }), "SignataIdentity: The identity has already been locked.");
-	});
+  });
 
   it("can unlock the second identity", async function () {
     const inputHash = web3.utils.sha3(TXTYPE_UNLOCK_DIGEST + "0x01".slice(2).padStart(64, '0'), {encoding: 'hex'});
@@ -392,7 +392,7 @@ describe("Signata Identity Contract", function () {
     await expectEvent(unlockReceipt, 'Unlock', {
       identity: i2
     });
-	});
+  });
 
     //rollover
 
@@ -448,7 +448,7 @@ describe("Signata Identity Contract", function () {
 
   it("can lock second identity with third security key", async function () {
     await expectEvent(await idContract.lock(i2, { from: s3 }), 'Lock', { identity: i2 });
-	});
+  });
   
   it("can rollover the second identity whilst locked", async function () {
     const inputHash = web3.utils.sha3(
@@ -541,5 +541,5 @@ describe("Signata Identity Contract", function () {
     await expectEvent(unlockReceipt, 'Unlock', {
       identity: i2
     });
-	});
+  });
 });
