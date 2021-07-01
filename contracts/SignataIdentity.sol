@@ -190,7 +190,11 @@ contract SignataIdentity {
         emit Lock(identity);
     }
     
-    function getDelegate(address identity) external view returns (address) {
+    function getDelegate(address identity)
+        external
+        view
+        returns (address)
+    {
         require(
             _identityExists[identity],
             "SignataIdentity: The identity must exist."
