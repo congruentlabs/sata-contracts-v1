@@ -110,36 +110,4 @@ describe("Dynamic Token Contract", () => {
     await expectRevert(token.mint(owner, tenMil, { from: owner }), "Supply Control Disabled.");
     await expectRevert(token.burn(owner, tenMil, { from: owner }), "Supply Control Disabled.");
   });
-
-  // it("cannot mint by default", async function() {
-
-  // });
-
-  // it("cannot mint by default", async function() {
-
-  // });
-
-  // it("cannot mint by default", async function() {
-
-  // });
-
-  // it("cannot mint by default", async function() {
-
-  // });
-
-  // it("cannot mint by default", async function() {
-
-  // });
-  
-  // it("mints the reserve address", async function() {
-  //   expect(await token.balanceOf(reserveAddr)).to.be.bignumber.equal(fortyMil);
-  // });
-
-  // it("mints the integration address", async function() {
-  //   expect(await token.balanceOf(intAddr)).to.be.bignumber.equal(tenMil);
-  // });
-
-  // it("succesfully mints the remainder", async function() {
-  //   expect(await token.totalSupply()).to.be.bignumber.equal(nintyMil);
-  // });
 });
