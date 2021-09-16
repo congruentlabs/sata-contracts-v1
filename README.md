@@ -8,17 +8,19 @@ More information about the SATA token, project, and whitepaper can be found at: 
 
 The ERC20 token contract is an extension of [OpenZeppelin](https://openzeppelin.com/)'s ERC20 contract. We've extended this to facilitate the Airdrop and minting of tokens specific to our project needs.
 
+The Dynamic token contract is also an extension of OpenZeppeline's ERC20 contract, but we've added a Supply Controller feature onto it to allow a delegated address to enable or disable token burning and minting. Burning and minting is still required to be performed by the token owner.
+
 This repository will house the first suite of contracts that utilise the SATA token, including for the first releases of the IdGAF. The V1 moniker is just added to the name in case we make a drastic change and need to shift to a V2 later down the track.
 
 ## Test
 
 ### Environment Setup
 
-Install Node v12 on your machine. We develop on Windows but other platforms shouldn't be a problem.
+Install Node v14 on your machine. We develop on Windows but other platforms shouldn't be a problem.
 
 On Windows make sure you're using PowerShell (I'd recommend Windows Terminal).
 
-Install truffle globally and the project dependencies:
+Install truffle globally and the project dependencies (if you want to keep truffle local to the repo, change the npm scripts to 'npx truffle ...' instead):
 
 ``` bash
 npm i -g truffle

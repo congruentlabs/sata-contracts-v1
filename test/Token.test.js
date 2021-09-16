@@ -2,7 +2,7 @@ const { accounts, contract, web3 } = require("@openzeppelin/test-environment");
 const { BN, expectRevert } = require("@openzeppelin/test-helpers");
 const { expect } = require("chai");
 
-const SATAToken = contract.fromArtifact("SATAToken");
+const Token = contract.fromArtifact("Token");
 const SATAAirdropV1 = contract.fromArtifact("SATAAirdropV1");
 const {
   pointOneEth,
@@ -33,7 +33,7 @@ var airdropContract;
 
 describe("Token Contract", function () {
   it("deployer is owner", async function () {
-    token = await SATAToken.new(
+    token = await Token.new(
       tokenName,
       tokenSymbol,
       reserveAddr,
