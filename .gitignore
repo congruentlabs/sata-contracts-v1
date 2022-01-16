@@ -49,5 +49,5 @@ Thumbs.db
 *.wmv
 
 .secret
-.infura
-.secret.prod
+.secret-test
+.urls.json

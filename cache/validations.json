@@ -1,0 +1,2718 @@
+{
+  "version": "3.2",
+  "log": [
+    {
+      "SignataAvatar": {
+        "src": "contracts\\SignataAvatar.sol:17",
+        "version": {
+          "withMetadata": "696bcfe9e82587abde943bcb73fc781311375d07701e5773bf06bbdc5ecafb0a",
+          "withoutMetadata": "08248623a547d5430e2390453ddf6ab1c30a5bbe518b0055195f08f2bf9efca6",
+          "linkedWithoutMetadata": "08248623a547d5430e2390453ddf6ab1c30a5bbe518b0055195f08f2bf9efca6"
+        },
+        "inherit": [
+          "IERC721Metadata",
+          "IERC721Enumerable",
+          "IERC721",
+          "IERC165"
+        ],
+        "libraries": [
+          "Address"
+        ],
+        "methods": [
+          "(string,string,string,address,address,address)",
+          "supportsInterface(bytes4)",
+          "getMintingSchema()",
+          "mintAvatar(address,bytes)",
+          "getPrimaryAvatar(address)",
+          "setPrimaryAvatar(uint256)",
+          "balanceOf(address)",
+          "ownerOf(uint256)",
+          "name()",
+          "symbol()",
+          "tokenURI(uint256)",
+          "approve(address,uint256)",
+          "getApproved(uint256)",
+          "setApprovalForAll(address,bool)",
+          "isApprovedForAll(address,address)",
+          "transferFrom(address,address,uint256)",
+          "safeTransferFrom(address,address,uint256)",
+          "safeTransferFrom(address,address,uint256,bytes)",
+          "tokenOfOwnerByIndex(address,uint256)",
+          "totalSupply()",
+          "tokenByIndex(uint256)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "SignataAvatar",
+            "src": "contracts\\SignataAvatar.sol:47"
+          },
+          {
+            "kind": "state-variable-immutable",
+            "name": "_mintingTokenSchema",
+            "src": "contracts\\SignataAvatar.sol:45"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "SignataAvatar",
+              "label": "_name",
+              "type": "t_string_storage",
+              "src": "contracts\\SignataAvatar.sol:29"
+            },
+            {
+              "contract": "SignataAvatar",
+              "label": "_symbol",
+              "type": "t_string_storage",
+              "src": "contracts\\SignataAvatar.sol:30"
+            },
+            {
+              "contract": "SignataAvatar",
+              "label": "_signataIdentity",
+              "type": "t_contract(SignataIdentity)2107",
+              "src": "contracts\\SignataAvatar.sol:32"
+            },
+            {
+              "contract": "SignataAvatar",
+              "label": "_signataRight",
+              "type": "t_contract(SignataRight)3952",
+              "src": "contracts\\SignataAvatar.sol:33"
+            },
+            {
+              "contract": "SignataAvatar",
+              "label": "_avatarToOwner",
+              "type": "t_mapping(t_uint256,t_address)",
+              "src": "contracts\\SignataAvatar.sol:35"
+            },
+            {
+              "contract": "SignataAvatar",
+              "label": "_ownerToPrimaryAvatar",
+              "type": "t_mapping(t_address,t_uint256)",
+              "src": "contracts\\SignataAvatar.sol:36"
+            },
+            {
+              "contract": "SignataAvatar",
+              "label": "_ownerToAvatarBalance",
+              "type": "t_mapping(t_address,t_uint256)",
+              "src": "contracts\\SignataAvatar.sol:37"
+            },
+            {
+              "contract": "SignataAvatar",
+              "label": "_avatarToApprovedAddress",
+              "type": "t_mapping(t_uint256,t_address)",
+              "src": "contracts\\SignataAvatar.sol:38"
+            },
+            {
+              "contract": "SignataAvatar",
+              "label": "_avatarToURI",
+              "type": "t_mapping(t_uint256,t_string_storage)",
+              "src": "contracts\\SignataAvatar.sol:39"
+            },
+            {
+              "contract": "SignataAvatar",
+              "label": "_ownerToOperatorStatuses",
+              "type": "t_mapping(t_address,t_mapping(t_address,t_bool))",
+              "src": "contracts\\SignataAvatar.sol:40"
+            },
+            {
+              "contract": "SignataAvatar",
+              "label": "_ownerToAvatars",
+              "type": "t_mapping(t_address,t_mapping(t_uint256,t_uint256))",
+              "src": "contracts\\SignataAvatar.sol:41"
+            },
+            {
+              "contract": "SignataAvatar",
+              "label": "_avatarToOwnersAvatarsIndex",
+              "type": "t_mapping(t_uint256,t_uint256)",
+              "src": "contracts\\SignataAvatar.sol:42"
+            },
+            {
+              "contract": "SignataAvatar",
+              "label": "_avatars",
+              "type": "t_array(t_uint256)dyn_storage",
+              "src": "contracts\\SignataAvatar.sol:43"
+            }
+          ],
+          "types": {
+            "t_string_storage": {
+              "label": "string"
+            },
+            "t_contract(SignataIdentity)2107": {
+              "label": "contract SignataIdentity"
+            },
+            "t_contract(SignataRight)3952": {
+              "label": "contract SignataRight"
+            },
+            "t_mapping(t_uint256,t_address)": {
+              "label": "mapping(uint256 => address)"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            },
+            "t_address": {
+              "label": "address"
+            },
+            "t_mapping(t_address,t_uint256)": {
+              "label": "mapping(address => uint256)"
+            },
+            "t_mapping(t_uint256,t_string_storage)": {
+              "label": "mapping(uint256 => string)"
+            },
+            "t_mapping(t_address,t_mapping(t_address,t_bool))": {
+              "label": "mapping(address => mapping(address => bool))"
+            },
+            "t_mapping(t_address,t_bool)": {
+              "label": "mapping(address => bool)"
+            },
+            "t_bool": {
+              "label": "bool"
+            },
+            "t_mapping(t_address,t_mapping(t_uint256,t_uint256))": {
+              "label": "mapping(address => mapping(uint256 => uint256))"
+            },
+            "t_mapping(t_uint256,t_uint256)": {
+              "label": "mapping(uint256 => uint256)"
+            },
+            "t_array(t_uint256)dyn_storage": {
+              "label": "uint256[]"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "SignataIdentity": {
+        "src": "contracts\\SignataIdentity.sol:5",
+        "version": {
+          "withMetadata": "ddb8288356a3c93af95b14039988d91b499849a5576e81ad52142cd0cff7f9a3",
+          "withoutMetadata": "b1de116ab7a211d789cfcc48d3b2b5f5724d79974925654e976b311a555999f0",
+          "linkedWithoutMetadata": "b1de116ab7a211d789cfcc48d3b2b5f5724d79974925654e976b311a555999f0"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "(uint256)",
+          "create(uint8,bytes32,bytes32,address,address)",
+          "destroy(address,uint8,bytes32,bytes32,uint8,bytes32,bytes32)",
+          "lock(address)",
+          "getDelegate(address)",
+          "getIdentity(address)",
+          "getLockCount(address)",
+          "getRolloverCount(address)",
+          "isLocked(address)",
+          "rollover(address,uint8,bytes32,bytes32,uint8,bytes32,bytes32,address,address)",
+          "unlock(address,uint8,bytes32,bytes32,uint8,bytes32,bytes32)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "SignataIdentity",
+            "src": "contracts\\SignataIdentity.sol:43"
+          },
+          {
+            "kind": "state-variable-immutable",
+            "name": "_domainSeperator",
+            "src": "contracts\\SignataIdentity.sol:31"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "SignataIdentity",
+              "label": "_delegateKeyToIdentity",
+              "type": "t_mapping(t_address,t_address)",
+              "src": "contracts\\SignataIdentity.sol:34"
+            },
+            {
+              "contract": "SignataIdentity",
+              "label": "_identityLockCount",
+              "type": "t_mapping(t_address,t_uint256)",
+              "src": "contracts\\SignataIdentity.sol:35"
+            },
+            {
+              "contract": "SignataIdentity",
+              "label": "_identityRolloverCount",
+              "type": "t_mapping(t_address,t_uint256)",
+              "src": "contracts\\SignataIdentity.sol:36"
+            },
+            {
+              "contract": "SignataIdentity",
+              "label": "_identityToSecurityKey",
+              "type": "t_mapping(t_address,t_address)",
+              "src": "contracts\\SignataIdentity.sol:37"
+            },
+            {
+              "contract": "SignataIdentity",
+              "label": "_identityToDelegateKey",
+              "type": "t_mapping(t_address,t_address)",
+              "src": "contracts\\SignataIdentity.sol:38"
+            },
+            {
+              "contract": "SignataIdentity",
+              "label": "_identityDestroyed",
+              "type": "t_mapping(t_address,t_bool)",
+              "src": "contracts\\SignataIdentity.sol:39"
+            },
+            {
+              "contract": "SignataIdentity",
+              "label": "_identityExists",
+              "type": "t_mapping(t_address,t_bool)",
+              "src": "contracts\\SignataIdentity.sol:40"
+            },
+            {
+              "contract": "SignataIdentity",
+              "label": "_identityLocked",
+              "type": "t_mapping(t_address,t_bool)",
+              "src": "contracts\\SignataIdentity.sol:41"
+            }
+          ],
+          "types": {
+            "t_mapping(t_address,t_address)": {
+              "label": "mapping(address => address)"
+            },
+            "t_address": {
+              "label": "address"
+            },
+            "t_mapping(t_address,t_uint256)": {
+              "label": "mapping(address => uint256)"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            },
+            "t_mapping(t_address,t_bool)": {
+              "label": "mapping(address => bool)"
+            },
+            "t_bool": {
+              "label": "bool"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "SignataRight": {
+        "src": "contracts\\SignataRight.sol:15",
+        "version": {
+          "withMetadata": "366ea9d52537e8401e02e5708c14a11f6829db7a11831d998f19cf578e5498c1",
+          "withoutMetadata": "68649434946f848d4501aa4775ee3df8fa29780d84ebb728bfff0411f588433e",
+          "linkedWithoutMetadata": "68649434946f848d4501aa4775ee3df8fa29780d84ebb728bfff0411f588433e"
+        },
+        "inherit": [
+          "IERC721Schema",
+          "IERC721Metadata",
+          "IERC721Enumerable",
+          "IERC721",
+          "IERC165"
+        ],
+        "libraries": [
+          "Address"
+        ],
+        "methods": [
+          "(string,string,address,string)",
+          "supportsInterface(bytes4)",
+          "mintSchema(address,bool,bool,string)",
+          "mintRight(uint256,address,bool)",
+          "balanceOf(address)",
+          "ownerOf(uint256)",
+          "name()",
+          "symbol()",
+          "tokenURI(uint256)",
+          "approve(address,uint256)",
+          "revoke(uint256)",
+          "isRevoked(uint256)",
+          "getApproved(uint256)",
+          "setApprovalForAll(address,bool)",
+          "isApprovedForAll(address,address)",
+          "transferFrom(address,address,uint256)",
+          "safeTransferFrom(address,address,uint256)",
+          "safeTransferFrom(address,address,uint256,bytes)",
+          "tokenOfOwnerByIndex(address,uint256)",
+          "totalSupply()",
+          "tokenByIndex(uint256)",
+          "schemaOf(uint256)",
+          "minterOf(uint256)",
+          "holdsTokenOfSchema(address,uint256)",
+          "totalSchemas()",
+          "totalMintedFor(uint256)",
+          "tokenOfSchemaByIndex(uint256,uint256)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "SignataRight",
+            "src": "contracts\\SignataRight.sol:58"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "SignataRight",
+              "label": "_name",
+              "type": "t_string_storage",
+              "src": "contracts\\SignataRight.sol:32"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_symbol",
+              "type": "t_string_storage",
+              "src": "contracts\\SignataRight.sol:33"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_signataIdentity",
+              "type": "t_contract(SignataIdentity)2107",
+              "src": "contracts\\SignataRight.sol:34"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_schemaToRightBalance",
+              "type": "t_mapping(t_uint256,t_uint256)",
+              "src": "contracts\\SignataRight.sol:37"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_schemaToRights",
+              "type": "t_mapping(t_uint256,t_mapping(t_uint256,t_uint256))",
+              "src": "contracts\\SignataRight.sol:38"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_schemaRevocable",
+              "type": "t_mapping(t_uint256,t_bool)",
+              "src": "contracts\\SignataRight.sol:39"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_schemaTransferable",
+              "type": "t_mapping(t_uint256,t_bool)",
+              "src": "contracts\\SignataRight.sol:40"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_schemaToURI",
+              "type": "t_mapping(t_uint256,t_string_storage)",
+              "src": "contracts\\SignataRight.sol:41"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_uriHashToSchema",
+              "type": "t_mapping(t_bytes32,t_uint256)",
+              "src": "contracts\\SignataRight.sol:42"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_schemaToMintingRight",
+              "type": "t_mapping(t_uint256,t_uint256)",
+              "src": "contracts\\SignataRight.sol:43"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_ownerToSchemaBalance",
+              "type": "t_mapping(t_address,t_mapping(t_uint256,t_uint256))",
+              "src": "contracts\\SignataRight.sol:44"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_schemasTotal",
+              "type": "t_uint256",
+              "src": "contracts\\SignataRight.sol:45"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_rightToOwner",
+              "type": "t_mapping(t_uint256,t_address)",
+              "src": "contracts\\SignataRight.sol:48"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_ownerToRightBalance",
+              "type": "t_mapping(t_address,t_uint256)",
+              "src": "contracts\\SignataRight.sol:49"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_rightToApprovedAddress",
+              "type": "t_mapping(t_uint256,t_address)",
+              "src": "contracts\\SignataRight.sol:50"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_rightToRevocationStatus",
+              "type": "t_mapping(t_uint256,t_bool)",
+              "src": "contracts\\SignataRight.sol:51"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_rightToSchema",
+              "type": "t_mapping(t_uint256,t_uint256)",
+              "src": "contracts\\SignataRight.sol:52"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_ownerToOperatorStatuses",
+              "type": "t_mapping(t_address,t_mapping(t_address,t_bool))",
+              "src": "contracts\\SignataRight.sol:53"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_ownerToRights",
+              "type": "t_mapping(t_address,t_mapping(t_uint256,t_uint256))",
+              "src": "contracts\\SignataRight.sol:54"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_rightToOwnerRightsIndex",
+              "type": "t_mapping(t_uint256,t_uint256)",
+              "src": "contracts\\SignataRight.sol:55"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_rightsTotal",
+              "type": "t_uint256",
+              "src": "contracts\\SignataRight.sol:56"
+            }
+          ],
+          "types": {
+            "t_string_storage": {
+              "label": "string"
+            },
+            "t_contract(SignataIdentity)2107": {
+              "label": "contract SignataIdentity"
+            },
+            "t_mapping(t_uint256,t_uint256)": {
+              "label": "mapping(uint256 => uint256)"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            },
+            "t_mapping(t_uint256,t_mapping(t_uint256,t_uint256))": {
+              "label": "mapping(uint256 => mapping(uint256 => uint256))"
+            },
+            "t_mapping(t_uint256,t_bool)": {
+              "label": "mapping(uint256 => bool)"
+            },
+            "t_bool": {
+              "label": "bool"
+            },
+            "t_mapping(t_uint256,t_string_storage)": {
+              "label": "mapping(uint256 => string)"
+            },
+            "t_mapping(t_bytes32,t_uint256)": {
+              "label": "mapping(bytes32 => uint256)"
+            },
+            "t_bytes32": {
+              "label": "bytes32"
+            },
+            "t_mapping(t_address,t_mapping(t_uint256,t_uint256))": {
+              "label": "mapping(address => mapping(uint256 => uint256))"
+            },
+            "t_address": {
+              "label": "address"
+            },
+            "t_mapping(t_uint256,t_address)": {
+              "label": "mapping(uint256 => address)"
+            },
+            "t_mapping(t_address,t_uint256)": {
+              "label": "mapping(address => uint256)"
+            },
+            "t_mapping(t_address,t_mapping(t_address,t_bool))": {
+              "label": "mapping(address => mapping(address => bool))"
+            },
+            "t_mapping(t_address,t_bool)": {
+              "label": "mapping(address => bool)"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "IERC165": {
+        "src": "contracts\\tokens\\IERC165.sol:5",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "supportsInterface(bytes4)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "IERC721": {
+        "src": "contracts\\tokens\\IERC721.sol:7",
+        "inherit": [
+          "IERC165"
+        ],
+        "libraries": [],
+        "methods": [
+          "balanceOf(address)",
+          "ownerOf(uint256)",
+          "safeTransferFrom(address,address,uint256)",
+          "transferFrom(address,address,uint256)",
+          "approve(address,uint256)",
+          "getApproved(uint256)",
+          "setApprovalForAll(address,bool)",
+          "isApprovedForAll(address,address)",
+          "safeTransferFrom(address,address,uint256,bytes)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "IERC721Enumerable": {
+        "src": "contracts\\tokens\\IERC721Enumerable.sol:7",
+        "inherit": [
+          "IERC721",
+          "IERC165"
+        ],
+        "libraries": [],
+        "methods": [
+          "totalSupply()",
+          "tokenOfOwnerByIndex(address,uint256)",
+          "tokenByIndex(uint256)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "IERC721Metadata": {
+        "src": "contracts\\tokens\\IERC721Metadata.sol:7",
+        "inherit": [
+          "IERC721",
+          "IERC165"
+        ],
+        "libraries": [],
+        "methods": [
+          "name()",
+          "symbol()",
+          "tokenURI(uint256)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "IERC721Receiver": {
+        "src": "contracts\\tokens\\IERC721Receiver.sol:5",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "onERC721Received(address,address,uint256,bytes)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "IERC721Schema": {
+        "src": "contracts\\tokens\\IERC721Schema.sol:8",
+        "inherit": [
+          "IERC721Metadata",
+          "IERC721Enumerable",
+          "IERC721",
+          "IERC165"
+        ],
+        "libraries": [],
+        "methods": [
+          "schemaOf(uint256)",
+          "minterOf(uint256)",
+          "holdsTokenOfSchema(address,uint256)",
+          "totalSchemas()",
+          "totalMintedFor(uint256)",
+          "tokenOfSchemaByIndex(uint256,uint256)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "Address": {
+        "src": "contracts\\types\\extensions\\Address.sol:5",
+        "version": {
+          "withMetadata": "4409664c37293ff14870ee6e0fc167f00bb4ee60b628a1ddad3e67d2e7cfe1a9",
+          "withoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff",
+          "linkedWithoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      }
+    },
+    {
+      "Ownable": {
+        "src": "@openzeppelin\\contracts\\access\\Ownable.sol:20",
+        "inherit": [
+          "Context"
+        ],
+        "libraries": [],
+        "methods": [
+          "owner()",
+          "renounceOwnership()",
+          "transferOwnership(address)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "Ownable",
+            "src": "@openzeppelin\\contracts\\access\\Ownable.sol:28"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "Ownable",
+              "label": "_owner",
+              "type": "t_address",
+              "src": "@openzeppelin\\contracts\\access\\Ownable.sol:21"
+            }
+          ],
+          "types": {
+            "t_address": {
+              "label": "address"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "ERC20": {
+        "src": "@openzeppelin\\contracts\\token\\ERC20\\ERC20.sol:35",
+        "version": {
+          "withMetadata": "c673a15be87c9dcafad0879f15e06724dfeaf840b6274bcf58eac37d4af06a8f",
+          "withoutMetadata": "411ae407679b3f91ede3e6daa092b23000f03b2f4c713fdaaf1bb950c8cff805",
+          "linkedWithoutMetadata": "411ae407679b3f91ede3e6daa092b23000f03b2f4c713fdaaf1bb950c8cff805"
+        },
+        "inherit": [
+          "IERC20Metadata",
+          "IERC20",
+          "Context"
+        ],
+        "libraries": [],
+        "methods": [
+          "(string,string)",
+          "name()",
+          "symbol()",
+          "decimals()",
+          "totalSupply()",
+          "balanceOf(address)",
+          "transfer(address,uint256)",
+          "allowance(address,address)",
+          "approve(address,uint256)",
+          "transferFrom(address,address,uint256)",
+          "increaseAllowance(address,uint256)",
+          "decreaseAllowance(address,uint256)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "ERC20",
+            "src": "@openzeppelin\\contracts\\token\\ERC20\\ERC20.sol:54"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "ERC20",
+              "label": "_balances",
+              "type": "t_mapping(t_address,t_uint256)",
+              "src": "@openzeppelin\\contracts\\token\\ERC20\\ERC20.sol:36"
+            },
+            {
+              "contract": "ERC20",
+              "label": "_allowances",
+              "type": "t_mapping(t_address,t_mapping(t_address,t_uint256))",
+              "src": "@openzeppelin\\contracts\\token\\ERC20\\ERC20.sol:38"
+            },
+            {
+              "contract": "ERC20",
+              "label": "_totalSupply",
+              "type": "t_uint256",
+              "src": "@openzeppelin\\contracts\\token\\ERC20\\ERC20.sol:40"
+            },
+            {
+              "contract": "ERC20",
+              "label": "_name",
+              "type": "t_string_storage",
+              "src": "@openzeppelin\\contracts\\token\\ERC20\\ERC20.sol:42"
+            },
+            {
+              "contract": "ERC20",
+              "label": "_symbol",
+              "type": "t_string_storage",
+              "src": "@openzeppelin\\contracts\\token\\ERC20\\ERC20.sol:43"
+            }
+          ],
+          "types": {
+            "t_mapping(t_address,t_uint256)": {
+              "label": "mapping(address => uint256)"
+            },
+            "t_address": {
+              "label": "address"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            },
+            "t_mapping(t_address,t_mapping(t_address,t_uint256))": {
+              "label": "mapping(address => mapping(address => uint256))"
+            },
+            "t_string_storage": {
+              "label": "string"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "IERC20": {
+        "src": "contracts\\tokens\\IERC20.sol:9",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "totalSupply()",
+          "balanceOf(address)",
+          "transfer(address,uint256)",
+          "allowance(address,address)",
+          "approve(address,uint256)",
+          "transferFrom(address,address,uint256)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "IERC20Metadata": {
+        "src": "@openzeppelin\\contracts\\token\\ERC20\\extensions\\IERC20Metadata.sol:13",
+        "inherit": [
+          "IERC20"
+        ],
+        "libraries": [],
+        "methods": [
+          "name()",
+          "symbol()",
+          "decimals()"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "Context": {
+        "src": "@openzeppelin\\contracts\\utils\\Context.sol:16",
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "SATAAirdropV1": {
+        "src": "contracts\\Airdrop.sol:7",
+        "version": {
+          "withMetadata": "77945db27e3eb37244281a7022dc2aaa594455eca1d300108de712c5636ea437",
+          "withoutMetadata": "bcffd6b9d10150fe630b2bce784d1394632787813f220e784d9b7f088c0f1165",
+          "linkedWithoutMetadata": "bcffd6b9d10150fe630b2bce784d1394632787813f220e784d9b7f088c0f1165"
+        },
+        "inherit": [
+          "Ownable",
+          "Context"
+        ],
+        "libraries": [],
+        "methods": [
+          "(address,uint256,uint256)",
+          "endAirdrop(address)",
+          "availableTokens()",
+          "claim()"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "SATAAirdropV1",
+            "src": "contracts\\Airdrop.sol:13"
+          },
+          {
+            "kind": "state-variable-immutable",
+            "name": "token",
+            "src": "contracts\\Airdrop.sol:10"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "SATAAirdropV1",
+              "label": "airdropAmount",
+              "type": "t_uint256",
+              "src": "contracts\\Airdrop.sol:8"
+            },
+            {
+              "contract": "SATAAirdropV1",
+              "label": "reqEthBalance",
+              "type": "t_uint256",
+              "src": "contracts\\Airdrop.sol:9"
+            },
+            {
+              "contract": "SATAAirdropV1",
+              "label": "claimedAddresses",
+              "type": "t_mapping(t_address,t_bool)",
+              "src": "contracts\\Airdrop.sol:11"
+            }
+          ],
+          "types": {
+            "t_uint256": {
+              "label": "uint256"
+            },
+            "t_mapping(t_address,t_bool)": {
+              "label": "mapping(address => bool)"
+            },
+            "t_address": {
+              "label": "address"
+            },
+            "t_bool": {
+              "label": "bool"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "Migrations": {
+        "src": "contracts\\Migrations.sol:4",
+        "version": {
+          "withMetadata": "57460669443f62db6953e28f5f4717dd18849c040362a5f2864820aba3217677",
+          "withoutMetadata": "c5565779356de17a0495e7fcd99388d5c40df2760d70c41cdeddbf64acaf296b",
+          "linkedWithoutMetadata": "c5565779356de17a0495e7fcd99388d5c40df2760d70c41cdeddbf64acaf296b"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "setCompleted(uint256)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "state-variable-assignment",
+            "name": "owner",
+            "src": "contracts\\Migrations.sol:5"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "Migrations",
+              "label": "owner",
+              "type": "t_address",
+              "src": "contracts\\Migrations.sol:5"
+            },
+            {
+              "contract": "Migrations",
+              "label": "last_completed_migration",
+              "type": "t_uint256",
+              "src": "contracts\\Migrations.sol:6"
+            }
+          ],
+          "types": {
+            "t_address": {
+              "label": "address"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "SignataAvatar": {
+        "src": "contracts\\SignataAvatar.sol:17",
+        "version": {
+          "withMetadata": "91c23e67e63422ed5a4dd2b3db5e737b238346f2281042273f3daea698e25191",
+          "withoutMetadata": "08248623a547d5430e2390453ddf6ab1c30a5bbe518b0055195f08f2bf9efca6",
+          "linkedWithoutMetadata": "08248623a547d5430e2390453ddf6ab1c30a5bbe518b0055195f08f2bf9efca6"
+        },
+        "inherit": [
+          "IERC721Metadata",
+          "IERC721Enumerable",
+          "IERC721",
+          "IERC165"
+        ],
+        "libraries": [
+          "Address"
+        ],
+        "methods": [
+          "(string,string,string,address,address,address)",
+          "supportsInterface(bytes4)",
+          "getMintingSchema()",
+          "mintAvatar(address,bytes)",
+          "getPrimaryAvatar(address)",
+          "setPrimaryAvatar(uint256)",
+          "balanceOf(address)",
+          "ownerOf(uint256)",
+          "name()",
+          "symbol()",
+          "tokenURI(uint256)",
+          "approve(address,uint256)",
+          "getApproved(uint256)",
+          "setApprovalForAll(address,bool)",
+          "isApprovedForAll(address,address)",
+          "transferFrom(address,address,uint256)",
+          "safeTransferFrom(address,address,uint256)",
+          "safeTransferFrom(address,address,uint256,bytes)",
+          "tokenOfOwnerByIndex(address,uint256)",
+          "totalSupply()",
+          "tokenByIndex(uint256)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "SignataAvatar",
+            "src": "contracts\\SignataAvatar.sol:47"
+          },
+          {
+            "kind": "state-variable-immutable",
+            "name": "_mintingTokenSchema",
+            "src": "contracts\\SignataAvatar.sol:45"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "SignataAvatar",
+              "label": "_name",
+              "type": "t_string_storage",
+              "src": "contracts\\SignataAvatar.sol:29"
+            },
+            {
+              "contract": "SignataAvatar",
+              "label": "_symbol",
+              "type": "t_string_storage",
+              "src": "contracts\\SignataAvatar.sol:30"
+            },
+            {
+              "contract": "SignataAvatar",
+              "label": "_signataIdentity",
+              "type": "t_contract(SignataIdentity)3056",
+              "src": "contracts\\SignataAvatar.sol:32"
+            },
+            {
+              "contract": "SignataAvatar",
+              "label": "_signataRight",
+              "type": "t_contract(SignataRight)4909",
+              "src": "contracts\\SignataAvatar.sol:33"
+            },
+            {
+              "contract": "SignataAvatar",
+              "label": "_avatarToOwner",
+              "type": "t_mapping(t_uint256,t_address)",
+              "src": "contracts\\SignataAvatar.sol:35"
+            },
+            {
+              "contract": "SignataAvatar",
+              "label": "_ownerToPrimaryAvatar",
+              "type": "t_mapping(t_address,t_uint256)",
+              "src": "contracts\\SignataAvatar.sol:36"
+            },
+            {
+              "contract": "SignataAvatar",
+              "label": "_ownerToAvatarBalance",
+              "type": "t_mapping(t_address,t_uint256)",
+              "src": "contracts\\SignataAvatar.sol:37"
+            },
+            {
+              "contract": "SignataAvatar",
+              "label": "_avatarToApprovedAddress",
+              "type": "t_mapping(t_uint256,t_address)",
+              "src": "contracts\\SignataAvatar.sol:38"
+            },
+            {
+              "contract": "SignataAvatar",
+              "label": "_avatarToURI",
+              "type": "t_mapping(t_uint256,t_string_storage)",
+              "src": "contracts\\SignataAvatar.sol:39"
+            },
+            {
+              "contract": "SignataAvatar",
+              "label": "_ownerToOperatorStatuses",
+              "type": "t_mapping(t_address,t_mapping(t_address,t_bool))",
+              "src": "contracts\\SignataAvatar.sol:40"
+            },
+            {
+              "contract": "SignataAvatar",
+              "label": "_ownerToAvatars",
+              "type": "t_mapping(t_address,t_mapping(t_uint256,t_uint256))",
+              "src": "contracts\\SignataAvatar.sol:41"
+            },
+            {
+              "contract": "SignataAvatar",
+              "label": "_avatarToOwnersAvatarsIndex",
+              "type": "t_mapping(t_uint256,t_uint256)",
+              "src": "contracts\\SignataAvatar.sol:42"
+            },
+            {
+              "contract": "SignataAvatar",
+              "label": "_avatars",
+              "type": "t_array(t_uint256)dyn_storage",
+              "src": "contracts\\SignataAvatar.sol:43"
+            }
+          ],
+          "types": {
+            "t_string_storage": {
+              "label": "string"
+            },
+            "t_contract(SignataIdentity)3056": {
+              "label": "contract SignataIdentity"
+            },
+            "t_contract(SignataRight)4909": {
+              "label": "contract SignataRight"
+            },
+            "t_mapping(t_uint256,t_address)": {
+              "label": "mapping(uint256 => address)"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            },
+            "t_address": {
+              "label": "address"
+            },
+            "t_mapping(t_address,t_uint256)": {
+              "label": "mapping(address => uint256)"
+            },
+            "t_mapping(t_uint256,t_string_storage)": {
+              "label": "mapping(uint256 => string)"
+            },
+            "t_mapping(t_address,t_mapping(t_address,t_bool))": {
+              "label": "mapping(address => mapping(address => bool))"
+            },
+            "t_mapping(t_address,t_bool)": {
+              "label": "mapping(address => bool)"
+            },
+            "t_bool": {
+              "label": "bool"
+            },
+            "t_mapping(t_address,t_mapping(t_uint256,t_uint256))": {
+              "label": "mapping(address => mapping(uint256 => uint256))"
+            },
+            "t_mapping(t_uint256,t_uint256)": {
+              "label": "mapping(uint256 => uint256)"
+            },
+            "t_array(t_uint256)dyn_storage": {
+              "label": "uint256[]"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "SignataIdentity": {
+        "src": "contracts\\SignataIdentity.sol:5",
+        "version": {
+          "withMetadata": "ddb8288356a3c93af95b14039988d91b499849a5576e81ad52142cd0cff7f9a3",
+          "withoutMetadata": "b1de116ab7a211d789cfcc48d3b2b5f5724d79974925654e976b311a555999f0",
+          "linkedWithoutMetadata": "b1de116ab7a211d789cfcc48d3b2b5f5724d79974925654e976b311a555999f0"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "(uint256)",
+          "create(uint8,bytes32,bytes32,address,address)",
+          "destroy(address,uint8,bytes32,bytes32,uint8,bytes32,bytes32)",
+          "lock(address)",
+          "getDelegate(address)",
+          "getIdentity(address)",
+          "getLockCount(address)",
+          "getRolloverCount(address)",
+          "isLocked(address)",
+          "rollover(address,uint8,bytes32,bytes32,uint8,bytes32,bytes32,address,address)",
+          "unlock(address,uint8,bytes32,bytes32,uint8,bytes32,bytes32)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "SignataIdentity",
+            "src": "contracts\\SignataIdentity.sol:43"
+          },
+          {
+            "kind": "state-variable-immutable",
+            "name": "_domainSeperator",
+            "src": "contracts\\SignataIdentity.sol:31"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "SignataIdentity",
+              "label": "_delegateKeyToIdentity",
+              "type": "t_mapping(t_address,t_address)",
+              "src": "contracts\\SignataIdentity.sol:34"
+            },
+            {
+              "contract": "SignataIdentity",
+              "label": "_identityLockCount",
+              "type": "t_mapping(t_address,t_uint256)",
+              "src": "contracts\\SignataIdentity.sol:35"
+            },
+            {
+              "contract": "SignataIdentity",
+              "label": "_identityRolloverCount",
+              "type": "t_mapping(t_address,t_uint256)",
+              "src": "contracts\\SignataIdentity.sol:36"
+            },
+            {
+              "contract": "SignataIdentity",
+              "label": "_identityToSecurityKey",
+              "type": "t_mapping(t_address,t_address)",
+              "src": "contracts\\SignataIdentity.sol:37"
+            },
+            {
+              "contract": "SignataIdentity",
+              "label": "_identityToDelegateKey",
+              "type": "t_mapping(t_address,t_address)",
+              "src": "contracts\\SignataIdentity.sol:38"
+            },
+            {
+              "contract": "SignataIdentity",
+              "label": "_identityDestroyed",
+              "type": "t_mapping(t_address,t_bool)",
+              "src": "contracts\\SignataIdentity.sol:39"
+            },
+            {
+              "contract": "SignataIdentity",
+              "label": "_identityExists",
+              "type": "t_mapping(t_address,t_bool)",
+              "src": "contracts\\SignataIdentity.sol:40"
+            },
+            {
+              "contract": "SignataIdentity",
+              "label": "_identityLocked",
+              "type": "t_mapping(t_address,t_bool)",
+              "src": "contracts\\SignataIdentity.sol:41"
+            }
+          ],
+          "types": {
+            "t_mapping(t_address,t_address)": {
+              "label": "mapping(address => address)"
+            },
+            "t_address": {
+              "label": "address"
+            },
+            "t_mapping(t_address,t_uint256)": {
+              "label": "mapping(address => uint256)"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            },
+            "t_mapping(t_address,t_bool)": {
+              "label": "mapping(address => bool)"
+            },
+            "t_bool": {
+              "label": "bool"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "SignataRight": {
+        "src": "contracts\\SignataRight.sol:15",
+        "inherit": [
+          "IERC721Schema",
+          "IERC721Metadata",
+          "IERC721Enumerable",
+          "IERC721",
+          "IERC165"
+        ],
+        "libraries": [
+          "Address"
+        ],
+        "methods": [
+          "supportsInterface(bytes4)",
+          "mintSchema(address,bool,bool,string)",
+          "mintRight(uint256,address,bool)",
+          "balanceOf(address)",
+          "ownerOf(uint256,bool)",
+          "name()",
+          "symbol()",
+          "tokenURI(uint256)",
+          "approve(address,uint256)",
+          "revoke(uint256)",
+          "isRevoked(uint256)",
+          "getApproved(uint256)",
+          "setApprovalForAll(address,bool)",
+          "isApprovedForAll(address,address)",
+          "transferFrom(address,address,uint256)",
+          "safeTransferFrom(address,address,uint256)",
+          "safeTransferFrom(address,address,uint256,bytes)",
+          "tokenOfOwnerByIndex(address,uint256)",
+          "totalSupply()",
+          "tokenByIndex(uint256)",
+          "schemaOf(uint256)",
+          "minterOf(uint256)",
+          "holdsTokenOfSchema(address,uint256)",
+          "totalSchemas()",
+          "totalMintedFor(uint256)",
+          "tokenOfSchemaByIndex(uint256,uint256)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "SignataRight",
+            "src": "contracts\\SignataRight.sol:58"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "SignataRight",
+              "label": "_name",
+              "type": "t_string_storage",
+              "src": "contracts\\SignataRight.sol:32"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_symbol",
+              "type": "t_string_storage",
+              "src": "contracts\\SignataRight.sol:33"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_signataIdentity",
+              "type": "t_contract(SignataIdentity)3056",
+              "src": "contracts\\SignataRight.sol:34"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_schemaToRightBalance",
+              "type": "t_mapping(t_uint256,t_uint256)",
+              "src": "contracts\\SignataRight.sol:37"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_schemaToRights",
+              "type": "t_mapping(t_uint256,t_mapping(t_uint256,t_uint256))",
+              "src": "contracts\\SignataRight.sol:38"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_schemaRevocable",
+              "type": "t_mapping(t_uint256,t_bool)",
+              "src": "contracts\\SignataRight.sol:39"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_schemaTransferable",
+              "type": "t_mapping(t_uint256,t_bool)",
+              "src": "contracts\\SignataRight.sol:40"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_schemaToURI",
+              "type": "t_mapping(t_uint256,t_string_storage)",
+              "src": "contracts\\SignataRight.sol:41"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_uriHashToSchema",
+              "type": "t_mapping(t_bytes32,t_uint256)",
+              "src": "contracts\\SignataRight.sol:42"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_schemaToMintingRight",
+              "type": "t_mapping(t_uint256,t_uint256)",
+              "src": "contracts\\SignataRight.sol:43"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_ownerToSchemaBalance",
+              "type": "t_mapping(t_address,t_mapping(t_uint256,t_uint256))",
+              "src": "contracts\\SignataRight.sol:44"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_schemasTotal",
+              "type": "t_uint256",
+              "src": "contracts\\SignataRight.sol:45"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_rightToOwner",
+              "type": "t_mapping(t_uint256,t_address)",
+              "src": "contracts\\SignataRight.sol:48"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_ownerToRightBalance",
+              "type": "t_mapping(t_address,t_uint256)",
+              "src": "contracts\\SignataRight.sol:49"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_rightToApprovedAddress",
+              "type": "t_mapping(t_uint256,t_address)",
+              "src": "contracts\\SignataRight.sol:50"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_rightToRevocationStatus",
+              "type": "t_mapping(t_uint256,t_bool)",
+              "src": "contracts\\SignataRight.sol:51"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_rightToSchema",
+              "type": "t_mapping(t_uint256,t_uint256)",
+              "src": "contracts\\SignataRight.sol:52"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_ownerToOperatorStatuses",
+              "type": "t_mapping(t_address,t_mapping(t_address,t_bool))",
+              "src": "contracts\\SignataRight.sol:53"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_ownerToRights",
+              "type": "t_mapping(t_address,t_mapping(t_uint256,t_uint256))",
+              "src": "contracts\\SignataRight.sol:54"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_rightToOwnerRightsIndex",
+              "type": "t_mapping(t_uint256,t_uint256)",
+              "src": "contracts\\SignataRight.sol:55"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_rightsTotal",
+              "type": "t_uint256",
+              "src": "contracts\\SignataRight.sol:56"
+            }
+          ],
+          "types": {
+            "t_string_storage": {
+              "label": "string"
+            },
+            "t_contract(SignataIdentity)3056": {
+              "label": "contract SignataIdentity"
+            },
+            "t_mapping(t_uint256,t_uint256)": {
+              "label": "mapping(uint256 => uint256)"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            },
+            "t_mapping(t_uint256,t_mapping(t_uint256,t_uint256))": {
+              "label": "mapping(uint256 => mapping(uint256 => uint256))"
+            },
+            "t_mapping(t_uint256,t_bool)": {
+              "label": "mapping(uint256 => bool)"
+            },
+            "t_bool": {
+              "label": "bool"
+            },
+            "t_mapping(t_uint256,t_string_storage)": {
+              "label": "mapping(uint256 => string)"
+            },
+            "t_mapping(t_bytes32,t_uint256)": {
+              "label": "mapping(bytes32 => uint256)"
+            },
+            "t_bytes32": {
+              "label": "bytes32"
+            },
+            "t_mapping(t_address,t_mapping(t_uint256,t_uint256))": {
+              "label": "mapping(address => mapping(uint256 => uint256))"
+            },
+            "t_address": {
+              "label": "address"
+            },
+            "t_mapping(t_uint256,t_address)": {
+              "label": "mapping(uint256 => address)"
+            },
+            "t_mapping(t_address,t_uint256)": {
+              "label": "mapping(address => uint256)"
+            },
+            "t_mapping(t_address,t_mapping(t_address,t_bool))": {
+              "label": "mapping(address => mapping(address => bool))"
+            },
+            "t_mapping(t_address,t_bool)": {
+              "label": "mapping(address => bool)"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "Token": {
+        "src": "contracts\\Token.sol:7",
+        "version": {
+          "withMetadata": "1b46751d67fa1c74b43ce9394266a4b5f1b8f058434529dae5298bfe7af34f52",
+          "withoutMetadata": "eb47c8e8dad44413e3f8a7e57f514a2ebfb828ddba782ee3e0b89c13362590cf",
+          "linkedWithoutMetadata": "eb47c8e8dad44413e3f8a7e57f514a2ebfb828ddba782ee3e0b89c13362590cf"
+        },
+        "inherit": [
+          "Ownable",
+          "ERC20",
+          "IERC20Metadata",
+          "IERC20",
+          "Context"
+        ],
+        "libraries": [],
+        "methods": [
+          "(string,string,address,uint256,address,uint256,uint256)",
+          "mintAirdrop(address,uint256)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "Token",
+            "src": "contracts\\Token.sol:10"
+          },
+          {
+            "kind": "state-variable-assignment",
+            "name": "airdropMinted",
+            "src": "contracts\\Token.sol:8"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "Token",
+              "label": "airdropMinted",
+              "type": "t_bool",
+              "src": "contracts\\Token.sol:8"
+            }
+          ],
+          "types": {
+            "t_bool": {
+              "label": "bool"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "ISwap": {
+        "src": "contracts\\swap\\ISwap.sol:5",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "swap(address,uint256,uint256,address,address,uint256,address,uint256,uint8,bytes32,bytes32)",
+          "light(uint256,uint256,address,address,uint256,address,uint256,uint8,bytes32,bytes32)",
+          "buyNFT(uint256,uint256,address,address,uint256,address,uint256,uint8,bytes32,bytes32)",
+          "sellNFT(uint256,uint256,address,address,uint256,address,uint256,uint8,bytes32,bytes32)",
+          "swapNFTs(uint256,uint256,address,address,uint256,address,uint256,uint8,bytes32,bytes32)",
+          "authorize(address)",
+          "revoke()",
+          "cancel(uint256[])",
+          "nonceUsed(address,uint256)",
+          "authorized(address)",
+          "calculateProtocolFee(address,uint256)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "IERC165": {
+        "src": "contracts\\tokens\\IERC165.sol:5",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "supportsInterface(bytes4)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "IERC721": {
+        "src": "contracts\\tokens\\IERC721.sol:7",
+        "inherit": [
+          "IERC165"
+        ],
+        "libraries": [],
+        "methods": [
+          "balanceOf(address)",
+          "ownerOf(uint256)",
+          "safeTransferFrom(address,address,uint256)",
+          "transferFrom(address,address,uint256)",
+          "approve(address,uint256)",
+          "getApproved(uint256)",
+          "setApprovalForAll(address,bool)",
+          "isApprovedForAll(address,address)",
+          "safeTransferFrom(address,address,uint256,bytes)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "IERC721Enumerable": {
+        "src": "contracts\\tokens\\IERC721Enumerable.sol:7",
+        "inherit": [
+          "IERC721",
+          "IERC165"
+        ],
+        "libraries": [],
+        "methods": [
+          "totalSupply()",
+          "tokenOfOwnerByIndex(address,uint256)",
+          "tokenByIndex(uint256)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "IERC721Metadata": {
+        "src": "contracts\\tokens\\IERC721Metadata.sol:7",
+        "inherit": [
+          "IERC721",
+          "IERC165"
+        ],
+        "libraries": [],
+        "methods": [
+          "name()",
+          "symbol()",
+          "tokenURI(uint256)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "IERC721Receiver": {
+        "src": "contracts\\tokens\\IERC721Receiver.sol:5",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "onERC721Received(address,address,uint256,bytes)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "IERC721Schema": {
+        "src": "contracts\\tokens\\IERC721Schema.sol:8",
+        "inherit": [
+          "IERC721Metadata",
+          "IERC721Enumerable",
+          "IERC721",
+          "IERC165"
+        ],
+        "libraries": [],
+        "methods": [
+          "schemaOf(uint256)",
+          "minterOf(uint256)",
+          "holdsTokenOfSchema(address,uint256)",
+          "totalSchemas()",
+          "totalMintedFor(uint256)",
+          "tokenOfSchemaByIndex(uint256,uint256)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "Address": {
+        "src": "contracts\\types\\extensions\\Address.sol:5",
+        "version": {
+          "withMetadata": "4409664c37293ff14870ee6e0fc167f00bb4ee60b628a1ddad3e67d2e7cfe1a9",
+          "withoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff",
+          "linkedWithoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      }
+    },
+    {
+      "Ownable": {
+        "src": "@openzeppelin\\contracts\\access\\Ownable.sol:20",
+        "inherit": [
+          "Context"
+        ],
+        "libraries": [],
+        "methods": [
+          "owner()",
+          "renounceOwnership()",
+          "transferOwnership(address)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "Ownable",
+            "src": "@openzeppelin\\contracts\\access\\Ownable.sol:28"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "Ownable",
+              "label": "_owner",
+              "type": "t_address",
+              "src": "@openzeppelin\\contracts\\access\\Ownable.sol:21"
+            }
+          ],
+          "types": {
+            "t_address": {
+              "label": "address"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "ERC20": {
+        "src": "@openzeppelin\\contracts\\token\\ERC20\\ERC20.sol:35",
+        "version": {
+          "withMetadata": "c673a15be87c9dcafad0879f15e06724dfeaf840b6274bcf58eac37d4af06a8f",
+          "withoutMetadata": "411ae407679b3f91ede3e6daa092b23000f03b2f4c713fdaaf1bb950c8cff805",
+          "linkedWithoutMetadata": "411ae407679b3f91ede3e6daa092b23000f03b2f4c713fdaaf1bb950c8cff805"
+        },
+        "inherit": [
+          "IERC20Metadata",
+          "IERC20",
+          "Context"
+        ],
+        "libraries": [],
+        "methods": [
+          "(string,string)",
+          "name()",
+          "symbol()",
+          "decimals()",
+          "totalSupply()",
+          "balanceOf(address)",
+          "transfer(address,uint256)",
+          "allowance(address,address)",
+          "approve(address,uint256)",
+          "transferFrom(address,address,uint256)",
+          "increaseAllowance(address,uint256)",
+          "decreaseAllowance(address,uint256)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "ERC20",
+            "src": "@openzeppelin\\contracts\\token\\ERC20\\ERC20.sol:54"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "ERC20",
+              "label": "_balances",
+              "type": "t_mapping(t_address,t_uint256)",
+              "src": "@openzeppelin\\contracts\\token\\ERC20\\ERC20.sol:36"
+            },
+            {
+              "contract": "ERC20",
+              "label": "_allowances",
+              "type": "t_mapping(t_address,t_mapping(t_address,t_uint256))",
+              "src": "@openzeppelin\\contracts\\token\\ERC20\\ERC20.sol:38"
+            },
+            {
+              "contract": "ERC20",
+              "label": "_totalSupply",
+              "type": "t_uint256",
+              "src": "@openzeppelin\\contracts\\token\\ERC20\\ERC20.sol:40"
+            },
+            {
+              "contract": "ERC20",
+              "label": "_name",
+              "type": "t_string_storage",
+              "src": "@openzeppelin\\contracts\\token\\ERC20\\ERC20.sol:42"
+            },
+            {
+              "contract": "ERC20",
+              "label": "_symbol",
+              "type": "t_string_storage",
+              "src": "@openzeppelin\\contracts\\token\\ERC20\\ERC20.sol:43"
+            }
+          ],
+          "types": {
+            "t_mapping(t_address,t_uint256)": {
+              "label": "mapping(address => uint256)"
+            },
+            "t_address": {
+              "label": "address"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            },
+            "t_mapping(t_address,t_mapping(t_address,t_uint256))": {
+              "label": "mapping(address => mapping(address => uint256))"
+            },
+            "t_string_storage": {
+              "label": "string"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "IERC20": {
+        "src": "contracts\\tokens\\IERC20.sol:9",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "totalSupply()",
+          "balanceOf(address)",
+          "transfer(address,uint256)",
+          "allowance(address,address)",
+          "approve(address,uint256)",
+          "transferFrom(address,address,uint256)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "IERC20Metadata": {
+        "src": "@openzeppelin\\contracts\\token\\ERC20\\extensions\\IERC20Metadata.sol:13",
+        "inherit": [
+          "IERC20"
+        ],
+        "libraries": [],
+        "methods": [
+          "name()",
+          "symbol()",
+          "decimals()"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "Context": {
+        "src": "@openzeppelin\\contracts\\utils\\Context.sol:16",
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "SATAAirdropV1": {
+        "src": "contracts\\Airdrop.sol:7",
+        "version": {
+          "withMetadata": "77945db27e3eb37244281a7022dc2aaa594455eca1d300108de712c5636ea437",
+          "withoutMetadata": "bcffd6b9d10150fe630b2bce784d1394632787813f220e784d9b7f088c0f1165",
+          "linkedWithoutMetadata": "bcffd6b9d10150fe630b2bce784d1394632787813f220e784d9b7f088c0f1165"
+        },
+        "inherit": [
+          "Ownable",
+          "Context"
+        ],
+        "libraries": [],
+        "methods": [
+          "(address,uint256,uint256)",
+          "endAirdrop(address)",
+          "availableTokens()",
+          "claim()"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "SATAAirdropV1",
+            "src": "contracts\\Airdrop.sol:13"
+          },
+          {
+            "kind": "state-variable-immutable",
+            "name": "token",
+            "src": "contracts\\Airdrop.sol:10"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "SATAAirdropV1",
+              "label": "airdropAmount",
+              "type": "t_uint256",
+              "src": "contracts\\Airdrop.sol:8"
+            },
+            {
+              "contract": "SATAAirdropV1",
+              "label": "reqEthBalance",
+              "type": "t_uint256",
+              "src": "contracts\\Airdrop.sol:9"
+            },
+            {
+              "contract": "SATAAirdropV1",
+              "label": "claimedAddresses",
+              "type": "t_mapping(t_address,t_bool)",
+              "src": "contracts\\Airdrop.sol:11"
+            }
+          ],
+          "types": {
+            "t_uint256": {
+              "label": "uint256"
+            },
+            "t_mapping(t_address,t_bool)": {
+              "label": "mapping(address => bool)"
+            },
+            "t_address": {
+              "label": "address"
+            },
+            "t_bool": {
+              "label": "bool"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "Migrations": {
+        "src": "contracts\\Migrations.sol:4",
+        "version": {
+          "withMetadata": "57460669443f62db6953e28f5f4717dd18849c040362a5f2864820aba3217677",
+          "withoutMetadata": "c5565779356de17a0495e7fcd99388d5c40df2760d70c41cdeddbf64acaf296b",
+          "linkedWithoutMetadata": "c5565779356de17a0495e7fcd99388d5c40df2760d70c41cdeddbf64acaf296b"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "setCompleted(uint256)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "state-variable-assignment",
+            "name": "owner",
+            "src": "contracts\\Migrations.sol:5"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "Migrations",
+              "label": "owner",
+              "type": "t_address",
+              "src": "contracts\\Migrations.sol:5"
+            },
+            {
+              "contract": "Migrations",
+              "label": "last_completed_migration",
+              "type": "t_uint256",
+              "src": "contracts\\Migrations.sol:6"
+            }
+          ],
+          "types": {
+            "t_address": {
+              "label": "address"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "SignataAvatar": {
+        "src": "contracts\\SignataAvatar.sol:17",
+        "version": {
+          "withMetadata": "91c23e67e63422ed5a4dd2b3db5e737b238346f2281042273f3daea698e25191",
+          "withoutMetadata": "08248623a547d5430e2390453ddf6ab1c30a5bbe518b0055195f08f2bf9efca6",
+          "linkedWithoutMetadata": "08248623a547d5430e2390453ddf6ab1c30a5bbe518b0055195f08f2bf9efca6"
+        },
+        "inherit": [
+          "IERC721Metadata",
+          "IERC721Enumerable",
+          "IERC721",
+          "IERC165"
+        ],
+        "libraries": [
+          "Address"
+        ],
+        "methods": [
+          "(string,string,string,address,address,address)",
+          "supportsInterface(bytes4)",
+          "getMintingSchema()",
+          "mintAvatar(address,bytes)",
+          "getPrimaryAvatar(address)",
+          "setPrimaryAvatar(uint256)",
+          "balanceOf(address)",
+          "ownerOf(uint256)",
+          "name()",
+          "symbol()",
+          "tokenURI(uint256)",
+          "approve(address,uint256)",
+          "getApproved(uint256)",
+          "setApprovalForAll(address,bool)",
+          "isApprovedForAll(address,address)",
+          "transferFrom(address,address,uint256)",
+          "safeTransferFrom(address,address,uint256)",
+          "safeTransferFrom(address,address,uint256,bytes)",
+          "tokenOfOwnerByIndex(address,uint256)",
+          "totalSupply()",
+          "tokenByIndex(uint256)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "SignataAvatar",
+            "src": "contracts\\SignataAvatar.sol:47"
+          },
+          {
+            "kind": "state-variable-immutable",
+            "name": "_mintingTokenSchema",
+            "src": "contracts\\SignataAvatar.sol:45"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "SignataAvatar",
+              "label": "_name",
+              "type": "t_string_storage",
+              "src": "contracts\\SignataAvatar.sol:29"
+            },
+            {
+              "contract": "SignataAvatar",
+              "label": "_symbol",
+              "type": "t_string_storage",
+              "src": "contracts\\SignataAvatar.sol:30"
+            },
+            {
+              "contract": "SignataAvatar",
+              "label": "_signataIdentity",
+              "type": "t_contract(SignataIdentity)3056",
+              "src": "contracts\\SignataAvatar.sol:32"
+            },
+            {
+              "contract": "SignataAvatar",
+              "label": "_signataRight",
+              "type": "t_contract(SignataRight)4909",
+              "src": "contracts\\SignataAvatar.sol:33"
+            },
+            {
+              "contract": "SignataAvatar",
+              "label": "_avatarToOwner",
+              "type": "t_mapping(t_uint256,t_address)",
+              "src": "contracts\\SignataAvatar.sol:35"
+            },
+            {
+              "contract": "SignataAvatar",
+              "label": "_ownerToPrimaryAvatar",
+              "type": "t_mapping(t_address,t_uint256)",
+              "src": "contracts\\SignataAvatar.sol:36"
+            },
+            {
+              "contract": "SignataAvatar",
+              "label": "_ownerToAvatarBalance",
+              "type": "t_mapping(t_address,t_uint256)",
+              "src": "contracts\\SignataAvatar.sol:37"
+            },
+            {
+              "contract": "SignataAvatar",
+              "label": "_avatarToApprovedAddress",
+              "type": "t_mapping(t_uint256,t_address)",
+              "src": "contracts\\SignataAvatar.sol:38"
+            },
+            {
+              "contract": "SignataAvatar",
+              "label": "_avatarToURI",
+              "type": "t_mapping(t_uint256,t_string_storage)",
+              "src": "contracts\\SignataAvatar.sol:39"
+            },
+            {
+              "contract": "SignataAvatar",
+              "label": "_ownerToOperatorStatuses",
+              "type": "t_mapping(t_address,t_mapping(t_address,t_bool))",
+              "src": "contracts\\SignataAvatar.sol:40"
+            },
+            {
+              "contract": "SignataAvatar",
+              "label": "_ownerToAvatars",
+              "type": "t_mapping(t_address,t_mapping(t_uint256,t_uint256))",
+              "src": "contracts\\SignataAvatar.sol:41"
+            },
+            {
+              "contract": "SignataAvatar",
+              "label": "_avatarToOwnersAvatarsIndex",
+              "type": "t_mapping(t_uint256,t_uint256)",
+              "src": "contracts\\SignataAvatar.sol:42"
+            },
+            {
+              "contract": "SignataAvatar",
+              "label": "_avatars",
+              "type": "t_array(t_uint256)dyn_storage",
+              "src": "contracts\\SignataAvatar.sol:43"
+            }
+          ],
+          "types": {
+            "t_string_storage": {
+              "label": "string"
+            },
+            "t_contract(SignataIdentity)3056": {
+              "label": "contract SignataIdentity"
+            },
+            "t_contract(SignataRight)4909": {
+              "label": "contract SignataRight"
+            },
+            "t_mapping(t_uint256,t_address)": {
+              "label": "mapping(uint256 => address)"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            },
+            "t_address": {
+              "label": "address"
+            },
+            "t_mapping(t_address,t_uint256)": {
+              "label": "mapping(address => uint256)"
+            },
+            "t_mapping(t_uint256,t_string_storage)": {
+              "label": "mapping(uint256 => string)"
+            },
+            "t_mapping(t_address,t_mapping(t_address,t_bool))": {
+              "label": "mapping(address => mapping(address => bool))"
+            },
+            "t_mapping(t_address,t_bool)": {
+              "label": "mapping(address => bool)"
+            },
+            "t_bool": {
+              "label": "bool"
+            },
+            "t_mapping(t_address,t_mapping(t_uint256,t_uint256))": {
+              "label": "mapping(address => mapping(uint256 => uint256))"
+            },
+            "t_mapping(t_uint256,t_uint256)": {
+              "label": "mapping(uint256 => uint256)"
+            },
+            "t_array(t_uint256)dyn_storage": {
+              "label": "uint256[]"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "SignataIdentity": {
+        "src": "contracts\\SignataIdentity.sol:5",
+        "version": {
+          "withMetadata": "ddb8288356a3c93af95b14039988d91b499849a5576e81ad52142cd0cff7f9a3",
+          "withoutMetadata": "b1de116ab7a211d789cfcc48d3b2b5f5724d79974925654e976b311a555999f0",
+          "linkedWithoutMetadata": "b1de116ab7a211d789cfcc48d3b2b5f5724d79974925654e976b311a555999f0"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "(uint256)",
+          "create(uint8,bytes32,bytes32,address,address)",
+          "destroy(address,uint8,bytes32,bytes32,uint8,bytes32,bytes32)",
+          "lock(address)",
+          "getDelegate(address)",
+          "getIdentity(address)",
+          "getLockCount(address)",
+          "getRolloverCount(address)",
+          "isLocked(address)",
+          "rollover(address,uint8,bytes32,bytes32,uint8,bytes32,bytes32,address,address)",
+          "unlock(address,uint8,bytes32,bytes32,uint8,bytes32,bytes32)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "SignataIdentity",
+            "src": "contracts\\SignataIdentity.sol:43"
+          },
+          {
+            "kind": "state-variable-immutable",
+            "name": "_domainSeperator",
+            "src": "contracts\\SignataIdentity.sol:31"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "SignataIdentity",
+              "label": "_delegateKeyToIdentity",
+              "type": "t_mapping(t_address,t_address)",
+              "src": "contracts\\SignataIdentity.sol:34"
+            },
+            {
+              "contract": "SignataIdentity",
+              "label": "_identityLockCount",
+              "type": "t_mapping(t_address,t_uint256)",
+              "src": "contracts\\SignataIdentity.sol:35"
+            },
+            {
+              "contract": "SignataIdentity",
+              "label": "_identityRolloverCount",
+              "type": "t_mapping(t_address,t_uint256)",
+              "src": "contracts\\SignataIdentity.sol:36"
+            },
+            {
+              "contract": "SignataIdentity",
+              "label": "_identityToSecurityKey",
+              "type": "t_mapping(t_address,t_address)",
+              "src": "contracts\\SignataIdentity.sol:37"
+            },
+            {
+              "contract": "SignataIdentity",
+              "label": "_identityToDelegateKey",
+              "type": "t_mapping(t_address,t_address)",
+              "src": "contracts\\SignataIdentity.sol:38"
+            },
+            {
+              "contract": "SignataIdentity",
+              "label": "_identityDestroyed",
+              "type": "t_mapping(t_address,t_bool)",
+              "src": "contracts\\SignataIdentity.sol:39"
+            },
+            {
+              "contract": "SignataIdentity",
+              "label": "_identityExists",
+              "type": "t_mapping(t_address,t_bool)",
+              "src": "contracts\\SignataIdentity.sol:40"
+            },
+            {
+              "contract": "SignataIdentity",
+              "label": "_identityLocked",
+              "type": "t_mapping(t_address,t_bool)",
+              "src": "contracts\\SignataIdentity.sol:41"
+            }
+          ],
+          "types": {
+            "t_mapping(t_address,t_address)": {
+              "label": "mapping(address => address)"
+            },
+            "t_address": {
+              "label": "address"
+            },
+            "t_mapping(t_address,t_uint256)": {
+              "label": "mapping(address => uint256)"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            },
+            "t_mapping(t_address,t_bool)": {
+              "label": "mapping(address => bool)"
+            },
+            "t_bool": {
+              "label": "bool"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "SignataRight": {
+        "src": "contracts\\SignataRight.sol:15",
+        "inherit": [
+          "IERC721Schema",
+          "IERC721Metadata",
+          "IERC721Enumerable",
+          "IERC721",
+          "IERC165"
+        ],
+        "libraries": [
+          "Address"
+        ],
+        "methods": [
+          "supportsInterface(bytes4)",
+          "mintSchema(address,bool,bool,string)",
+          "mintRight(uint256,address,bool)",
+          "balanceOf(address)",
+          "ownerOf(uint256,bool)",
+          "name()",
+          "symbol()",
+          "tokenURI(uint256)",
+          "approve(address,uint256)",
+          "revoke(uint256)",
+          "isRevoked(uint256)",
+          "getApproved(uint256)",
+          "setApprovalForAll(address,bool)",
+          "isApprovedForAll(address,address)",
+          "transferFrom(address,address,uint256)",
+          "safeTransferFrom(address,address,uint256)",
+          "safeTransferFrom(address,address,uint256,bytes)",
+          "tokenOfOwnerByIndex(address,uint256)",
+          "totalSupply()",
+          "tokenByIndex(uint256)",
+          "schemaOf(uint256)",
+          "minterOf(uint256)",
+          "holdsTokenOfSchema(address,uint256)",
+          "totalSchemas()",
+          "totalMintedFor(uint256)",
+          "tokenOfSchemaByIndex(uint256,uint256)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "SignataRight",
+            "src": "contracts\\SignataRight.sol:58"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "SignataRight",
+              "label": "_name",
+              "type": "t_string_storage",
+              "src": "contracts\\SignataRight.sol:32"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_symbol",
+              "type": "t_string_storage",
+              "src": "contracts\\SignataRight.sol:33"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_signataIdentity",
+              "type": "t_contract(SignataIdentity)3056",
+              "src": "contracts\\SignataRight.sol:34"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_schemaToRightBalance",
+              "type": "t_mapping(t_uint256,t_uint256)",
+              "src": "contracts\\SignataRight.sol:37"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_schemaToRights",
+              "type": "t_mapping(t_uint256,t_mapping(t_uint256,t_uint256))",
+              "src": "contracts\\SignataRight.sol:38"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_schemaRevocable",
+              "type": "t_mapping(t_uint256,t_bool)",
+              "src": "contracts\\SignataRight.sol:39"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_schemaTransferable",
+              "type": "t_mapping(t_uint256,t_bool)",
+              "src": "contracts\\SignataRight.sol:40"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_schemaToURI",
+              "type": "t_mapping(t_uint256,t_string_storage)",
+              "src": "contracts\\SignataRight.sol:41"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_uriHashToSchema",
+              "type": "t_mapping(t_bytes32,t_uint256)",
+              "src": "contracts\\SignataRight.sol:42"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_schemaToMintingRight",
+              "type": "t_mapping(t_uint256,t_uint256)",
+              "src": "contracts\\SignataRight.sol:43"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_ownerToSchemaBalance",
+              "type": "t_mapping(t_address,t_mapping(t_uint256,t_uint256))",
+              "src": "contracts\\SignataRight.sol:44"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_schemasTotal",
+              "type": "t_uint256",
+              "src": "contracts\\SignataRight.sol:45"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_rightToOwner",
+              "type": "t_mapping(t_uint256,t_address)",
+              "src": "contracts\\SignataRight.sol:48"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_ownerToRightBalance",
+              "type": "t_mapping(t_address,t_uint256)",
+              "src": "contracts\\SignataRight.sol:49"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_rightToApprovedAddress",
+              "type": "t_mapping(t_uint256,t_address)",
+              "src": "contracts\\SignataRight.sol:50"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_rightToRevocationStatus",
+              "type": "t_mapping(t_uint256,t_bool)",
+              "src": "contracts\\SignataRight.sol:51"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_rightToSchema",
+              "type": "t_mapping(t_uint256,t_uint256)",
+              "src": "contracts\\SignataRight.sol:52"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_ownerToOperatorStatuses",
+              "type": "t_mapping(t_address,t_mapping(t_address,t_bool))",
+              "src": "contracts\\SignataRight.sol:53"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_ownerToRights",
+              "type": "t_mapping(t_address,t_mapping(t_uint256,t_uint256))",
+              "src": "contracts\\SignataRight.sol:54"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_rightToOwnerRightsIndex",
+              "type": "t_mapping(t_uint256,t_uint256)",
+              "src": "contracts\\SignataRight.sol:55"
+            },
+            {
+              "contract": "SignataRight",
+              "label": "_rightsTotal",
+              "type": "t_uint256",
+              "src": "contracts\\SignataRight.sol:56"
+            }
+          ],
+          "types": {
+            "t_string_storage": {
+              "label": "string"
+            },
+            "t_contract(SignataIdentity)3056": {
+              "label": "contract SignataIdentity"
+            },
+            "t_mapping(t_uint256,t_uint256)": {
+              "label": "mapping(uint256 => uint256)"
+            },
+            "t_uint256": {
+              "label": "uint256"
+            },
+            "t_mapping(t_uint256,t_mapping(t_uint256,t_uint256))": {
+              "label": "mapping(uint256 => mapping(uint256 => uint256))"
+            },
+            "t_mapping(t_uint256,t_bool)": {
+              "label": "mapping(uint256 => bool)"
+            },
+            "t_bool": {
+              "label": "bool"
+            },
+            "t_mapping(t_uint256,t_string_storage)": {
+              "label": "mapping(uint256 => string)"
+            },
+            "t_mapping(t_bytes32,t_uint256)": {
+              "label": "mapping(bytes32 => uint256)"
+            },
+            "t_bytes32": {
+              "label": "bytes32"
+            },
+            "t_mapping(t_address,t_mapping(t_uint256,t_uint256))": {
+              "label": "mapping(address => mapping(uint256 => uint256))"
+            },
+            "t_address": {
+              "label": "address"
+            },
+            "t_mapping(t_uint256,t_address)": {
+              "label": "mapping(uint256 => address)"
+            },
+            "t_mapping(t_address,t_uint256)": {
+              "label": "mapping(address => uint256)"
+            },
+            "t_mapping(t_address,t_mapping(t_address,t_bool))": {
+              "label": "mapping(address => mapping(address => bool))"
+            },
+            "t_mapping(t_address,t_bool)": {
+              "label": "mapping(address => bool)"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "Token": {
+        "src": "contracts\\Token.sol:7",
+        "version": {
+          "withMetadata": "1b46751d67fa1c74b43ce9394266a4b5f1b8f058434529dae5298bfe7af34f52",
+          "withoutMetadata": "eb47c8e8dad44413e3f8a7e57f514a2ebfb828ddba782ee3e0b89c13362590cf",
+          "linkedWithoutMetadata": "eb47c8e8dad44413e3f8a7e57f514a2ebfb828ddba782ee3e0b89c13362590cf"
+        },
+        "inherit": [
+          "Ownable",
+          "ERC20",
+          "IERC20Metadata",
+          "IERC20",
+          "Context"
+        ],
+        "libraries": [],
+        "methods": [
+          "(string,string,address,uint256,address,uint256,uint256)",
+          "mintAirdrop(address,uint256)"
+        ],
+        "linkReferences": [],
+        "errors": [
+          {
+            "kind": "constructor",
+            "contract": "Token",
+            "src": "contracts\\Token.sol:10"
+          },
+          {
+            "kind": "state-variable-assignment",
+            "name": "airdropMinted",
+            "src": "contracts\\Token.sol:8"
+          }
+        ],
+        "layout": {
+          "storage": [
+            {
+              "contract": "Token",
+              "label": "airdropMinted",
+              "type": "t_bool",
+              "src": "contracts\\Token.sol:8"
+            }
+          ],
+          "types": {
+            "t_bool": {
+              "label": "bool"
+            }
+          },
+          "layoutVersion": "1.1"
+        }
+      },
+      "ISwap": {
+        "src": "contracts\\swap\\ISwap.sol:5",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "swap(address,uint256,uint256,address,address,uint256,address,uint256,uint8,bytes32,bytes32)",
+          "light(uint256,uint256,address,address,uint256,address,uint256,uint8,bytes32,bytes32)",
+          "buyNFT(uint256,uint256,address,address,uint256,address,uint256,uint8,bytes32,bytes32)",
+          "sellNFT(uint256,uint256,address,address,uint256,address,uint256,uint8,bytes32,bytes32)",
+          "swapNFTs(uint256,uint256,address,address,uint256,address,uint256,uint8,bytes32,bytes32)",
+          "authorize(address)",
+          "revoke()",
+          "cancel(uint256[])",
+          "nonceUsed(address,uint256)",
+          "authorized(address)",
+          "calculateProtocolFee(address,uint256)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "IERC165": {
+        "src": "contracts\\tokens\\IERC165.sol:5",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "supportsInterface(bytes4)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "IERC721": {
+        "src": "contracts\\tokens\\IERC721.sol:7",
+        "inherit": [
+          "IERC165"
+        ],
+        "libraries": [],
+        "methods": [
+          "balanceOf(address)",
+          "ownerOf(uint256)",
+          "safeTransferFrom(address,address,uint256)",
+          "transferFrom(address,address,uint256)",
+          "approve(address,uint256)",
+          "getApproved(uint256)",
+          "setApprovalForAll(address,bool)",
+          "isApprovedForAll(address,address)",
+          "safeTransferFrom(address,address,uint256,bytes)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "IERC721Enumerable": {
+        "src": "contracts\\tokens\\IERC721Enumerable.sol:7",
+        "inherit": [
+          "IERC721",
+          "IERC165"
+        ],
+        "libraries": [],
+        "methods": [
+          "totalSupply()",
+          "tokenOfOwnerByIndex(address,uint256)",
+          "tokenByIndex(uint256)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "IERC721Metadata": {
+        "src": "contracts\\tokens\\IERC721Metadata.sol:7",
+        "inherit": [
+          "IERC721",
+          "IERC165"
+        ],
+        "libraries": [],
+        "methods": [
+          "name()",
+          "symbol()",
+          "tokenURI(uint256)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "IERC721Receiver": {
+        "src": "contracts\\tokens\\IERC721Receiver.sol:5",
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "onERC721Received(address,address,uint256,bytes)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "IERC721Schema": {
+        "src": "contracts\\tokens\\IERC721Schema.sol:8",
+        "inherit": [
+          "IERC721Metadata",
+          "IERC721Enumerable",
+          "IERC721",
+          "IERC165"
+        ],
+        "libraries": [],
+        "methods": [
+          "schemaOf(uint256)",
+          "minterOf(uint256)",
+          "holdsTokenOfSchema(address,uint256)",
+          "totalSchemas()",
+          "totalMintedFor(uint256)",
+          "tokenOfSchemaByIndex(uint256,uint256)"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      },
+      "Address": {
+        "src": "contracts\\types\\extensions\\Address.sol:5",
+        "version": {
+          "withMetadata": "4409664c37293ff14870ee6e0fc167f00bb4ee60b628a1ddad3e67d2e7cfe1a9",
+          "withoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff",
+          "linkedWithoutMetadata": "08d24783a787f8a51dea0c166bb6f91a4f0865e02d03d749f102d332e6ead0ff"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.1"
+        }
+      }
+    }
+  ]
+}

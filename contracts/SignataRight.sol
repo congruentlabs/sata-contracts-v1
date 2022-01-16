@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: MIT
-
-pragma solidity 0.8.7;
+pragma solidity 0.8.11;
 
 import "./tokens/IERC165.sol";
 import "./tokens/IERC721.sol";
@@ -18,7 +17,7 @@ contract SignataRight is IERC721Schema {
     
     event MintSchema(uint256 indexed schemaId, uint256 indexed mintingRightId, bytes32 indexed uriHash);
     
-    event MintRight(uint256 indexed schemaId, uint256 indexed rightId);
+    event MintRight(uint256 indexed schemaId, uint256 indexed rightId, bool indexed unbound);
     
     event Revoke(uint256 indexed rightId);
     
@@ -89,7 +88,7 @@ contract SignataRight is IERC721Schema {
         
         emit MintSchema(1, 1, uriHash);
         
-        emit MintRight(1, 1);
+        emit MintRight(1, 1, false);
         
         emit Transfer(address(0), thisContract, 1);
     }
@@ -166,7 +165,7 @@ contract SignataRight is IERC721Schema {
             "SignataRight: must only transfer to ERC721Receiver implementers when recipient is a smart contract."
         );
         
-        emit MintRight(1, _rightsTotal);
+        emit MintRight(1, _rightsTotal, false);
         
         emit Transfer(address(0), minter, _rightsTotal);
         
@@ -175,7 +174,7 @@ contract SignataRight is IERC721Schema {
         return _schemasTotal;
     }
     
-    function mintRight(uint256 schemaId, address to) external {
+    function mintRight(uint256 schemaId, address to, bool unbound) external {
         require(
             _rightsTotal != MAX_UINT256,
             "SignataRight: Maximum amount of tokens already minted."
@@ -208,6 +207,8 @@ contract SignataRight is IERC721Schema {
         
         if (to.isContract()) {
             recipient = to;
+        } else if (unbound == true) {
+            recipient = to;
         } else {
             recipient = _signataIdentity.getIdentity(to);
             
@@ -238,7 +239,7 @@ contract SignataRight is IERC721Schema {
             "SignataRight: must only transfer to ERC721Receiver implementers when recipient is a smart contract."
         );
         
-        emit MintRight(schemaId, _rightsTotal);
+        emit MintRight(schemaId, _rightsTotal, unbound);
         
         emit Transfer(address(0), to, _rightsTotal);
     }

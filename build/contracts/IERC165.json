@@ -21,7 +21,7 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.8.7+commit.e28d00a7\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"bytes4\",\"name\":\"interfaceId\",\"type\":\"bytes4\"}],\"name\":\"supportsInterface\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/tokens/IERC165.sol\":\"IERC165\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"project:/contracts/tokens/IERC165.sol\":{\"keccak256\":\"0x2f13976793b2be66c791505a4013d00dde00470ac0127be2d0da6b78507849cd\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://777220e49634777b23e5702c3c5411bf4c071372bb5d9716126ff3fc4b54906b\",\"dweb:/ipfs/QmTeB21LKcyJXLJ567i2xseFWZxvC1uRskWS7FNwvF7TQB\"]}},\"version\":1}",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.10+commit.fc410830\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"bytes4\",\"name\":\"interfaceId\",\"type\":\"bytes4\"}],\"name\":\"supportsInterface\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/tokens/IERC165.sol\":\"IERC165\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"project:/contracts/tokens/IERC165.sol\":{\"keccak256\":\"0x96668f27d50f2737d523f68904058e159adc1d3839f9200f139634554513b07c\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://aa514c82e8c43817ad83d10dbed569c21283b7739e21f9bb1392aafc1dc21b1e\",\"dweb:/ipfs/QmSkfCX6JErcbgWwFa8BsCrdL17h8fUbhWMYZHVjUcPuHm\"]}},\"version\":1}",
   "bytecode": "0x",
   "deployedBytecode": "0x",
   "immutableReferences": {},
@@ -29,65 +29,66 @@
   "deployedGeneratedSources": [],
   "sourceMap": "",
   "deployedSourceMap": "",
-  "source": "// SPDX-License-Identifier: MIT\r\n\r\npragma solidity 0.8.7;\r\n\r\ninterface IERC165 {\r\n\r\n    function supportsInterface(bytes4 interfaceId) external view returns (bool);\r\n}",
+  "source": "// SPDX-License-Identifier: MIT\r\n\r\npragma solidity 0.8.10;\r\n\r\ninterface IERC165 {\r\n\r\n    function supportsInterface(bytes4 interfaceId) external view returns (bool);\r\n}",
   "sourcePath": "C:\\Users\\tim\\Projects\\GitHub\\sata-contracts-v1\\contracts\\tokens\\IERC165.sol",
   "ast": {
     "absolutePath": "project:/contracts/tokens/IERC165.sol",
     "exportedSymbols": {
       "IERC165": [
-        5136
+        5230
       ]
     },
-    "id": 5137,
+    "id": 5231,
     "license": "MIT",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 5128,
+        "id": 5222,
         "literals": [
           "solidity",
           "0.8",
-          ".7"
+          ".10"
         ],
         "nodeType": "PragmaDirective",
-        "src": "35:22:12"
+        "src": "35:23:12"
       },
       {
         "abstract": false,
         "baseContracts": [],
+        "canonicalName": "IERC165",
         "contractDependencies": [],
         "contractKind": "interface",
         "fullyImplemented": false,
-        "id": 5136,
+        "id": 5230,
         "linearizedBaseContracts": [
-          5136
+          5230
         ],
         "name": "IERC165",
-        "nameLocation": "71:7:12",
+        "nameLocation": "72:7:12",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "functionSelector": "01ffc9a7",
-            "id": 5135,
+            "id": 5229,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "supportsInterface",
-            "nameLocation": "97:17:12",
+            "nameLocation": "98:17:12",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 5131,
+              "id": 5225,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 5130,
+                  "id": 5224,
                   "mutability": "mutable",
                   "name": "interfaceId",
-                  "nameLocation": "122:11:12",
+                  "nameLocation": "123:11:12",
                   "nodeType": "VariableDeclaration",
-                  "scope": 5135,
-                  "src": "115:18:12",
+                  "scope": 5229,
+                  "src": "116:18:12",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -95,10 +96,10 @@
                     "typeString": "bytes4"
                   },
                   "typeName": {
-                    "id": 5129,
+                    "id": 5223,
                     "name": "bytes4",
                     "nodeType": "ElementaryTypeName",
-                    "src": "115:6:12",
+                    "src": "116:6:12",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes4",
                       "typeString": "bytes4"
@@ -107,21 +108,21 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "114:20:12"
+              "src": "115:20:12"
             },
             "returnParameters": {
-              "id": 5134,
+              "id": 5228,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 5133,
+                  "id": 5227,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 5135,
-                  "src": "158:4:12",
+                  "scope": 5229,
+                  "src": "159:4:12",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -129,10 +130,10 @@
                     "typeString": "bool"
                   },
                   "typeName": {
-                    "id": 5132,
+                    "id": 5226,
                     "name": "bool",
                     "nodeType": "ElementaryTypeName",
-                    "src": "158:4:12",
+                    "src": "159:4:12",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
@@ -141,79 +142,80 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "157:6:12"
+              "src": "158:6:12"
             },
-            "scope": 5136,
-            "src": "88:76:12",
+            "scope": 5230,
+            "src": "89:76:12",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 5137,
-        "src": "61:106:12",
+        "scope": 5231,
+        "src": "62:106:12",
         "usedErrors": []
       }
     ],
-    "src": "35:132:12"
+    "src": "35:133:12"
   },
   "legacyAST": {
     "absolutePath": "project:/contracts/tokens/IERC165.sol",
     "exportedSymbols": {
       "IERC165": [
-        5136
+        5230
       ]
     },
-    "id": 5137,
+    "id": 5231,
     "license": "MIT",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 5128,
+        "id": 5222,
         "literals": [
           "solidity",
           "0.8",
-          ".7"
+          ".10"
         ],
         "nodeType": "PragmaDirective",
-        "src": "35:22:12"
+        "src": "35:23:12"
       },
       {
         "abstract": false,
         "baseContracts": [],
+        "canonicalName": "IERC165",
         "contractDependencies": [],
         "contractKind": "interface",
         "fullyImplemented": false,
-        "id": 5136,
+        "id": 5230,
         "linearizedBaseContracts": [
-          5136
+          5230
         ],
         "name": "IERC165",
-        "nameLocation": "71:7:12",
+        "nameLocation": "72:7:12",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "functionSelector": "01ffc9a7",
-            "id": 5135,
+            "id": 5229,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "supportsInterface",
-            "nameLocation": "97:17:12",
+            "nameLocation": "98:17:12",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 5131,
+              "id": 5225,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 5130,
+                  "id": 5224,
                   "mutability": "mutable",
                   "name": "interfaceId",
-                  "nameLocation": "122:11:12",
+                  "nameLocation": "123:11:12",
                   "nodeType": "VariableDeclaration",
-                  "scope": 5135,
-                  "src": "115:18:12",
+                  "scope": 5229,
+                  "src": "116:18:12",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -221,10 +223,10 @@
                     "typeString": "bytes4"
                   },
                   "typeName": {
-                    "id": 5129,
+                    "id": 5223,
                     "name": "bytes4",
                     "nodeType": "ElementaryTypeName",
-                    "src": "115:6:12",
+                    "src": "116:6:12",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes4",
                       "typeString": "bytes4"
@@ -233,21 +235,21 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "114:20:12"
+              "src": "115:20:12"
             },
             "returnParameters": {
-              "id": 5134,
+              "id": 5228,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 5133,
+                  "id": 5227,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 5135,
-                  "src": "158:4:12",
+                  "scope": 5229,
+                  "src": "159:4:12",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -255,10 +257,10 @@
                     "typeString": "bool"
                   },
                   "typeName": {
-                    "id": 5132,
+                    "id": 5226,
                     "name": "bool",
                     "nodeType": "ElementaryTypeName",
-                    "src": "158:4:12",
+                    "src": "159:4:12",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
@@ -267,29 +269,29 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "157:6:12"
+              "src": "158:6:12"
             },
-            "scope": 5136,
-            "src": "88:76:12",
+            "scope": 5230,
+            "src": "89:76:12",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 5137,
-        "src": "61:106:12",
+        "scope": 5231,
+        "src": "62:106:12",
         "usedErrors": []
       }
     ],
-    "src": "35:132:12"
+    "src": "35:133:12"
   },
   "compiler": {
     "name": "solc",
-    "version": "0.8.7+commit.e28d00a7.Emscripten.clang"
+    "version": "0.8.10+commit.fc410830.Emscripten.clang"
   },
   "networks": {},
   "schemaVersion": "3.4.3",
-  "updatedAt": "2021-09-16T15:29:42.953Z",
+  "updatedAt": "2021-12-20T12:16:40.023Z",
   "devdoc": {
     "kind": "dev",
     "methods": {},

@@ -1,3 +1,12 @@
+/**
+ * We need to use the openzeppelin/test-environment specifically because it exposes access to
+ * private keys of the accounts used in the testing. We need to access those private keys to be able
+ * to digitally sign records as part of the rights management. This means we also need to use truffle
+ * to run tests, because it depends on pulling in the abi definitions in the build folder. We will
+ * use hardhat for network deployments, and truffle for unit tests. If hardhat with ethers can give
+ * us exposure to the account private keys, or we find an alternate way to load in keys for testing
+ * (with loaded balances) then we can consolidate the testing to use hardhat as well.
+ */
 const Util = require('ethereumjs-util');
 const { accounts, privateKeys, contract, web3 } = require("@openzeppelin/test-environment");
 const { BN, expectRevert, expectEvent } = require("@openzeppelin/test-helpers");
@@ -27,6 +36,8 @@ const security2 = accounts[6];
 const identity3 = accounts[7];
 const delegate3 = accounts[8];
 const security3 = accounts[9];
+const unboundId = accounts[10];
+console.log(unboundId);
 
 const i1Private = privateKeys[1];
 const d1Private = privateKeys[2];
@@ -37,7 +48,7 @@ const s2Private = privateKeys[6];
 const i3Private = privateKeys[7];
 const d3Private = privateKeys[8];
 const s3Private = privateKeys[9];
-
+const unboundPrivate = privateKeys[10];
 
 var identityContract;
 var rightsContract;
@@ -47,6 +58,11 @@ var rightsContract;
  * of events in the blocks.
  */
 describe("Signata Right Contract", function () {
+  /**
+   * IDENTITY CONTRACT SETUP TESTS
+   * This replicates a lot of what the other identity contract tests do, we just do this again
+   * so this test file is independent to the identity tests
+   */
   it("can deploy the identity contract", async function () {
     identityContract = await SignataIdentity.new(CHAINID, { from: owner });
 
@@ -148,6 +164,9 @@ describe("Signata Right Contract", function () {
     });
   });
 
+  /**
+   * RIGHTS CONTRACT TESTS
+   */
 
   it("can deploy the rights contract", async function () {
     rightsContract = await SignataRight.new(
@@ -163,21 +182,19 @@ describe("Signata Right Contract", function () {
     expect(await rightsContract.symbol()).to.equal("RMINT");
   });
 
-
-  it("can get the tokenURI for the minter", async function() {
+  it("can get the tokenURI for the minter", async () => {
     expect(await rightsContract.tokenURI(1)).to.equal("https://signata.net/schema/rightsminters.json");
   });
 
-  it("can get the balance of the minter", async function() {
+  it("can get the balance of the minter", async () => {
     expect(await rightsContract.balanceOf(RIGHTS_CONTRACT_ADDRESS)).to.be.bignumber.equal(new BN(1));
   });
 
-  it("can get the owner of the minter", async function() {
+  it("can get the owner of the minter", async () => {
     expect(await rightsContract.ownerOf(1)).to.equal(RIGHTS_CONTRACT_ADDRESS);
   });
 
-
-  it("can mint a new schema as first delegate with transferable and revocable", async function() {
+  it("can mint a new schema as first delegate with transferable and revocable", async () => {
     const schemaReceipt = await rightsContract.mintSchema(
       delegate1,
       true,
@@ -195,33 +212,52 @@ describe("Signata Right Contract", function () {
     });
   });
 
-  it("can mint a new right as first delegate", async function() {
+  it("can mint a new right as first delegate", async () => {
     const rightReceipt = await rightsContract.mintRight(
       2,
       delegate1,
+      false,
       { from: delegate1 }
     );
 
     await expectEvent(rightReceipt, 'MintRight', {
       schemaId: new BN(2),
-      rightId: new BN(3)
+      rightId: new BN(3),
+      unbound: false
     });
   });
   
-  it("can mint a new right as first delegate to second delegate", async function() {
+  it("can mint a new right as first delegate to second delegate", async () => {
     const rightReceipt = await rightsContract.mintRight(
       2,
       delegate2,
+      false,
       { from: delegate1 }
     );
 
     await expectEvent(rightReceipt, 'MintRight', {
       schemaId: new BN(2),
-      rightId: new BN(4)
+      rightId: new BN(4),
+      unbound: false
+    });
+  });
+
+  it("can mint an unbound right as first delegate to unbound identity", async () => {
+    const rightReceipt = await rightsContract.mintRight(
+      2,
+      unboundId,
+      true,
+      { from: delegate1 }
+    );
+
+    await expectEvent(rightReceipt, 'MintRight', {
+      schemaId: new BN(2),
+      rightId: new BN(5),
+      unbound: true
     });
   });
   
-  it("can approve transferring the new right to the third identity", async function() {
+  it("can approve transferring the new right to the third identity", async () => {
     const approveReceipt = await rightsContract.approve(
       delegate3,
       4,
@@ -235,7 +271,7 @@ describe("Signata Right Contract", function () {
     });
   });
 
-  it("can transfer the new right to the third identity", async function() {
+  it("can transfer the new right to the third identity", async () => {
     const transferReceipt = await rightsContract.transferFrom(
       delegate2,
       delegate3,
@@ -250,20 +286,19 @@ describe("Signata Right Contract", function () {
     });
   });
 
-
-  it("can get the tokenURI for the first delegate", async function() {
+  it("can get the tokenURI for the first delegate", async () => {
     expect(await rightsContract.tokenURI(3, { from: delegate2 })).to.equal("https://foo.com/schema/admins.json");
   });
 
-  it("can get the balance of the first identity", async function() {
+  it("can get the balance of the first identity", async () => {
     expect(await rightsContract.balanceOf(delegate1)).to.be.bignumber.equal(new BN(2));
   });
 
-  it("can get the owner of the first identity", async function() {
+  it("can get the owner of the first identity", async () => {
     expect(await rightsContract.ownerOf(2)).to.equal(delegate1);
   });
 
-  it("can mint a new schema as second delegate without transferable and revocable", async function() {
+  it("can mint a new schema as second delegate without transferable and revocable", async () => {
     const schemaReceipt = await rightsContract.mintSchema(
       delegate2,
       false,
@@ -276,63 +311,97 @@ describe("Signata Right Contract", function () {
 
     await expectEvent(schemaReceipt, 'MintSchema', {
       schemaId: new BN(3),
-      mintingRightId: new BN(5),
+      mintingRightId: new BN(6),
       uriHash
     });
   });
 
-  it("can mint a new right as second delegate", async function() {
+  it("can mint a new right as second delegate", async () => {
     const rightReceipt = await rightsContract.mintRight(
       3,
       delegate1,
+      false,
       { from: delegate2 }
     );
 
     await expectEvent(rightReceipt, 'MintRight', {
       schemaId: new BN(3),
-      rightId: new BN(6)
+      rightId: new BN(7),
+      unbound: false
     });
   });
 
-  it("cannot transfer the second delegate non-transferable right", async function() {
+  it("cannot transfer the second delegate non-transferable right", async () => {
     await expectRevert(rightsContract.transferFrom(
       delegate1,
       delegate2,
-      6,
+      7,
       { from: identity2 }),
       "SignataRight: This right is non-transferable."
     );
   });
 
-  it("cannot revoke the second delegate rights", async function() {
+  it("cannot transfer an unbound right", async () => {
+    await expectRevert(rightsContract.transferFrom(
+      unboundId,
+      delegate2,
+      5,
+      { from: delegate1 }),
+      "SignataIdentity: The delegate key provided is not linked to an existing identity."
+    );
+  });
+  
+  it("can revoke a right", async () => {
+    const revokeReceipt = await rightsContract.revoke(
+      3,
+      { from: delegate1 }
+    );
+
+    await expectEvent(revokeReceipt, 'Revoke', {
+      rightId: new BN(3)
+    });
+  });
+
+  it("can revoke an unbound right", async () => {
+    const revokeReceipt = await rightsContract.revoke(
+      5,
+      { from: delegate1 }
+    );
+
+    await expectEvent(revokeReceipt, 'Revoke', {
+      rightId: new BN(5)
+    });
+  });
+
+  it("cannot revoke a non-revocable right", async () => {
     await expectRevert(rightsContract.revoke(
-      6,
+      7,
       { from: identity2 }),
       "SignataRight: The right specified is not revocable."
     );
   });
-  
-  it("can retreive total schemas", async function() {
+
+  it("can retrieve total schemas", async () => {
     expect(await rightsContract.totalSchemas()).to.be.bignumber.equal(new BN(3));
   });
   
-  it("can retreive total supply", async function() {
-    expect(await rightsContract.totalSupply()).to.be.bignumber.equal(new BN(6));
+  it("can retrieve total supply", async () => {
+    expect(await rightsContract.totalSupply()).to.be.bignumber.equal(new BN(7));
   });
 
-  it("can retreive minter of", async function() {
+  it("can retrieve minter of", async () => {
     expect(await rightsContract.minterOf(2)).to.equal(delegate1);
   });
 
-  it("cannot retreive minter of invalid schema", async function() {
+  it("cannot retrieve minter of invalid schema", async () => {
     await expectRevert(rightsContract.minterOf(4), "SignataRight: Schema ID must correspond to an existing schema.");
   });
   
-  it("can retreive schema of", async function() {
+  it("can retrieve schema of", async () => {
     expect(await rightsContract.totalSchemas()).to.be.bignumber.equal(new BN(3));
   });
 
-  it("can retreive token by index", async function() {
+  it("can retrieve token by index", async () => {
     expect(await rightsContract.totalSchemas()).to.be.bignumber.equal(new BN(3));
   });
 });

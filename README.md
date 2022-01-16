@@ -8,15 +8,15 @@ More information about the SATA token, project, and whitepaper can be found at: 
 
 The ERC20 token contract is an extension of [OpenZeppelin](https://openzeppelin.com/)'s ERC20 contract. We've extended this to facilitate the Airdrop and minting of tokens specific to our project needs.
 
-The Dynamic token contract is also an extension of OpenZeppeline's ERC20 contract, but we've added a Supply Controller feature onto it to allow a delegated address to enable or disable token burning and minting. Burning and minting is still required to be performed by the token owner.
+This repository also stores the core identity contracts for SATA and [Veriswap](https://veriswap.io/).
 
-This repository will house the first suite of contracts that utilise the SATA token, including for the first releases of the IdGAF. The V1 moniker is just added to the name in case we make a drastic change and need to shift to a V2 later down the track.
+The BEP20 token contract is stored in a separate repo as we forked it from the Binance BEP20 implementation: [sata-contracts-bsc-v1](https://github.com/congruentlabs/sata-contracts-bsc-v1)
 
 ## Test
 
 ### Environment Setup
 
-Install Node v14 on your machine. We develop on Windows but other platforms shouldn't be a problem.
+Install Node LTS on your machine. We develop on Windows but other platforms shouldn't be a problem.
 
 On Windows make sure you're using PowerShell (I'd recommend Windows Terminal).
 
@@ -34,15 +34,21 @@ Restart PowerShell as well, just to make sure Truffle is available on the system
 
 ### Running tests
 
-The test suite leans heavily on OpenZeppelin's testing tools. The tools run ganache-cli in the background, allowing for the test network to run deterministically.
+The test suite leans heavily on OpenZeppelin's testing tools. OZ's test environment by default has an expectation of using truffle compiled contracts, so we have to compile them with truffle for testing but compile them with hardhat for deployment. Yes, it's messy, and we need it consolidated to hardhat if we can later.
 
-Just run the `test` script to compile and execute the test suite:
+If you change any of the contracts or are running tests for the first time, run:
+
+``` bash
+npm run test:compile
+```
+
+Otherwise just run:
 
 ``` bash
 npm run test
 ```
 
-In some rare cases the first test will fail because of a race condition problem. Try running the tests again to confirm that it's not a race condition problem.
+Running the compile option every time is harmless, it just wastes your own time waiting for truffle to recompile every time.
 
 ### Running static analysis
 
@@ -51,6 +57,8 @@ To view static analysis of the project, run:
 ```bash
 npm run analyze
 ```
+
+Note: this is currently broken, we need to troubleshoot
 
 This will run `slither` on the project. Note that as we're using OpenZeppelin, a set of warnings will be shown for the OpenZeppelin contracts which we can ignore.
 
@@ -70,22 +78,33 @@ The ERC20 contract will mint tokens into the defined addresses, and then leave a
 
 The airdrop contract requires the SATA token contract to already be active to create it. Once created, then the mintAirdrop() function on the token contract can be invoked to mint the tokens for the airdrop.
 
-### Ropsten
+### Deployment Environment Setup
 
-In the project directory create `.secret` containing the testing wallet seed phrase, and `.infura` containing the Infura project ID for the test account.
+Create 3 files in the project directory. `.secret`, `.secret-test`, and `.urls.json`. In the secret files put the respective wallet seed (only do this on a hardened deployment machine). In the JSON file, fill it like the following example, substituting `{key}` with the API key from Moralis.
 
-Then run:
+We're using Moralis because the public testnet nodes have performance problems. We also use this over Infura because we can deploy BSC and other future networks under the same keys.
 
-``` bash
-npm run deploy-ropsten
+``` json
+{ 
+  "rinkeby": "https://speedy-nodes-nyc.moralis.io/{key}/eth/rinkeby",
+  "ropsten": "https://speedy-nodes-nyc.moralis.io/{key}/eth/ropsten",
+  "mainnet": "https://speedy-nodes-nyc.moralis.io/{key}/eth/mainnet",
+  "bscTestnet": "https://speedy-nodes-nyc.moralis.io/{key}/bsc/testnet",
+  "bscMainnet": "https://bsc-dataseed1.binance.org/"
+}
 ```
 
-and truffle will execute the `migrations/` scripts.
+### Rinkeby
 
-### Mainnet
-
-Run:
+We don't use Ropsten for testing any more as partners are preferring Rinkeby.
 
 ``` bash
-npm run deploy-mainnet
+npm run deploy:rinkeby
 ```
+
+### ETH Mainnet
+
+``` bash
+npm run deploy:mainnet
+```
+

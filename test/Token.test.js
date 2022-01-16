@@ -4,18 +4,18 @@ const { expect } = require("chai");
 
 const Token = contract.fromArtifact("Token");
 const SATAAirdropV1 = contract.fromArtifact("SATAAirdropV1");
-const {
-  pointOneEth,
-  ninePointNineOne,
-  tenThousand,
-  tenMil,
-  fortyMil,
-  remainderBalance,
-  nintyMil,
-  hundredMil,
-  tokenName,
-  tokenSymbol,
-} = require("../migrations/constants");
+
+const minEth             = "70000000000000000";
+const ninePointNineOne   = "9910000000000000000";
+const tenThousand        = "10000000000000000000000";
+const tenMil             = "10000000000000000000000000";
+const twentyMil          = "20000000000000000000000000";
+const fortyMil           = "40000000000000000000000000";
+const remainderBalance   = "49990000000000000000000000";
+const nintyMil           = "90000000000000000000000000";
+const hundredMil         = "100000000000000000000000000";
+const tokenName          = "Signata";
+const tokenSymbol        = "SATA";
 
 const [
   owner,
@@ -23,7 +23,6 @@ const [
   claimer2,
   claimer3,
 ] = accounts;
-
 
 const reserveAddr        = "0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0";
 const intAddr            = "0x22d491Bde2303f2f43325b2108D26f1eAbA1e32b";
