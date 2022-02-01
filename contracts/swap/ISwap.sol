@@ -1,142 +1,111 @@
-// SPDX-License-Identifier: MIT
-
-pragma solidity ^0.8.7;
-
 interface ISwap {
-  struct Order {
-    uint256 nonce;
-    uint256 expiry;
-    address signerWallet;
-    address signerToken;
-    uint256 signerAmount;
-    bool enforceIdentity;
-    bool checkRisk;
-    address senderWallet;
-    address senderToken;
-    uint256 senderAmount;
-    uint8 v;
-    bytes32 r;
-    bytes32 s;
-  }
-
   event Swap(
     uint256 indexed nonce,
     uint256 timestamp,
     address indexed signerWallet,
-    address signerToken,
     uint256 signerAmount,
-    uint256 protocolFee,
+    uint256 signerId,
+    address signerToken,
     address indexed senderWallet,
+    uint256 senderAmount,
+    uint256 senderId,
     address senderToken,
-    uint256 senderAmount
+    address affiliateWallet,
+    uint256 affiliateAmount,
+    uint256 affiliateId,
+    address affiliateToken
   );
 
-  event Cancel(uint256 indexed nonce, address indexed signerWallet);
+  event Cancel(
+    uint256 indexed nonce,
+    address indexed signerWallet
+  );
 
-  event Authorize(address indexed signer, address indexed signerWallet);
+  event CancelUpTo(
+    uint256 indexed nonce,
+    address indexed signerWallet
+  );
 
-  event Revoke(address indexed signer, address indexed signerWallet);
+  event AuthorizeSender(
+    address indexed authorizerAddress,
+    address indexed authorizedSender
+  );
 
-  event SetProtocolFee(uint256 protocolFee);
+  event AuthorizeSigner(
+    address indexed authorizerAddress,
+    address indexed authorizedSigner
+  );
 
-  event SetProtocolFeeLight(uint256 protocolFeeLight);
+  event RevokeSender(
+    address indexed authorizerAddress,
+    address indexed revokedSender
+  );
 
-  event SetProtocolFeeWallet(address indexed feeWallet);
-
-  event SetRebateScale(uint256 rebateScale);
-
-  event SetRebateMax(uint256 rebateMax);
-
-  event SetStakingToken(address indexed stakingToken);
-
+  event RevokeSigner(
+    address indexed authorizerAddress,
+    address indexed revokedSigner
+  );
+ 
+  /**
+    * @notice Atomic Token Swap
+    * @param order Types.Order
+    */
   function swap(
-    address recipient,
-    uint256 nonce,
-    uint256 expiry,
-    address signerWallet,
-    address signerToken,
-    uint256 signerAmount,
-    address senderToken,
-    uint256 senderAmount,
-    bool enforceIdentity,
-    bool checkRisk,
-    uint8 v,
-    bytes32 r,
-    bytes32 s
+    Types.Order calldata order
   ) external;
-
-  function light(
-    uint256 nonce,
-    uint256 expiry,
-    address signerWallet,
-    address signerToken,
-    uint256 signerAmount,
-    address senderToken,
-    uint256 senderAmount,
-    bool enforceIdentity,
-    bool checkRisk,
-    uint8 v,
-    bytes32 r,
-    bytes32 s
+ 
+  /**
+    * @notice Cancel one or more open orders by nonce
+    * @param nonces uint256[]
+    */
+  function cancel(
+    uint256[] calldata nonces
   ) external;
-
-  function buyNFT(
-    uint256 nonce,
-    uint256 expiry,
-    address signerWallet,
-    address signerToken,
-    uint256 signerAmount,
-    address senderToken,
-    uint256 senderAmount,
-    bool enforceIdentity,
-    bool checkRisk,
-    uint8 v,
-    bytes32 r,
-    bytes32 s
+ 
+  /**
+    * @notice Cancels all orders below a nonce value
+    * @dev These orders can be made active by reducing the minimum nonce
+    * @param minimumNonce uint256
+    */
+  function cancelUpTo(
+    uint256 minimumNonce
   ) external;
-
-  function sellNFT(
-    uint256 nonce,
-    uint256 expiry,
-    address signerWallet,
-    address signerToken,
-    uint256 signerAmount,
-    address senderToken,
-    uint256 senderAmount,
-    bool enforceIdentity,
-    bool checkRisk,
-    uint8 v,
-    bytes32 r,
-    bytes32 s
+ 
+  /**
+    * @notice Authorize a delegated sender
+    * @param authorizedSender address
+    */
+  function authorizeSender(
+    address authorizedSender
   ) external;
-
-  function swapNFTs(
-    uint256 nonce,
-    uint256 expiry,
-    address signerWallet,
-    address signerToken,
-    uint256 signerAmount,
-    address senderToken,
-    uint256 senderAmount,
-    bool enforceIdentity,
-    bool checkRisk,
-    uint8 v,
-    bytes32 r,
-    bytes32 s
+ 
+  /**
+    * @notice Authorize a delegated signer
+    * @param authorizedSigner address
+    */
+  function authorizeSigner(
+    address authorizedSigner
   ) external;
-
-  function authorize(address sender) external;
-
-  function revoke() external;
-
-  function cancel(uint256[] calldata nonces) external;
-
-  function nonceUsed(address, uint256) external view returns (bool);
-
-  function authorized(address) external view returns (address);
-
-  function calculateProtocolFee(address, uint256)
-    external
-    view
-    returns (uint256);
+ 
+  /**
+    * @notice Revoke an authorization
+    * @param authorizedSender address
+    */
+  function revokeSender(
+    address authorizedSender
+  ) external;
+ 
+  /**
+    * @notice Revoke an authorization
+    * @param authorizedSigner address
+    */
+  function revokeSigner(
+    address authorizedSigner
+  ) external;
+ 
+  function senderAuthorizations(address, address) external view returns (bool);
+  function signerAuthorizations(address, address) external view returns (bool);
+  function signerNonceStatus(address, uint256) external view returns (byte);
+  function signerMinimumNonce(address) external view returns (uint256);
+  function registry() external view returns (TransferHandlerRegistry);
 }
