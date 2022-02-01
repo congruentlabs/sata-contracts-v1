@@ -1,3 +1,8 @@
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.11;
+
+import "../types/SwapTypes.sol";
+
 interface ISwap {
   event Swap(
     uint256 indexed nonce,
@@ -105,7 +110,7 @@ interface ISwap {
  
   function senderAuthorizations(address, address) external view returns (bool);
   function signerAuthorizations(address, address) external view returns (bool);
-  function signerNonceStatus(address, uint256) external view returns (byte);
+  function signerNonceStatus(address, uint256) external view returns (bytes1);
   function signerMinimumNonce(address) external view returns (uint256);
   function registry() external view returns (TransferHandlerRegistry);
 }
