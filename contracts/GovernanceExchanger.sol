@@ -27,9 +27,9 @@ contract GovernanceExchanger is Ownable {
         
         require(allowance >= amount, "GovernanceExchanger::exchange: Token allowance too small.");
 
-        uint256 oldTokenBalance = IERC20(utilityToken).balanceOf(msg.sender);
+        uint256 utilityTokenBalance = IERC20(utilityToken).balanceOf(msg.sender);
 
-        require(oldTokenBalance >= amount, "GovernanceExchanger::exchange: Sender's balance must be greater than or equal to the amount requested.")
+        require(utilityTokenBalance >= amount, "GovernanceExchanger::exchange: Sender's balance must be greater than or equal to the amount requested.")
         require(IERC20(utilityToken).transferFrom(msg.sender, holdingAccount, amount), "GovernanceExchanger::exchange: Transfer of utility tokens failed.");
         require(IERC20(governanceToken).transfer(msg.sender, amount), "GovernanceExchanger::exchange: Transfer of governance tokens failed.");
         emit Exchanged(msg.sender, amount);
