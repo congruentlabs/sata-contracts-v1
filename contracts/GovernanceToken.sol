@@ -21,30 +21,24 @@ contract SignataDAO is ERC20, ERC20Burnable, ERC20Snapshot, Ownable, ERC20Permit
     mapping (address => bool) public automatedMarketMakerPairs;
     
     address public feeNativeReceiver;
-    bool private swapping;
+    bool public swapping;
     uint256 public lastSwapTime;
     bool public tradingActive;
-    bool public buyFeeEnabled = true;
-    bool public sellFeeEnabled = true;
     bool public transferFeesEnabled = true;
-    uint256 public buyFee = 100; // 1% default
-    uint256 public sellFee = 100; // 1% default
-    uint256 public swapTokensAtAmount = (25000 * 1e18); // 0.05% of the 50 mil total supply
+    bool public antiSnipeEnabled = true;
+    uint256 public feeAmount = 100; // 1% default
 
     // block number of opened trading
     uint256 launchedAt;
 
     event TaxesSwappedForNative(address recipient);
     event BoughtEarly(address indexed sniper);
-    event ModifiedSwapTokensAtAmount(uint256 oldAmount, uint256 newAmount);
-    event ModifiedBuyFee(uint256 oldAmount, uint256 newAmount);
-    event ModifiedSellFee(uint256 oldAmount, uint256 newAmount);
-    event BuyFeeEnabled();
-    event SellFeeEnabled();
-    event BuyFeeDisabled();
-    event SellFeeDisabled();
+    event ModifiedFee(uint256 oldAmount, uint256 newAmount);
+    event FeeEnabled();
+    event FeeDisabled();
     event TransferFeeEnabled();
     event TransferFeeDisabled();
+    event FeesTaken(uint256 feesAmount);
     event ExcludedFromFees(address account, bool excluded);
     event SetAutomatedMarketMakerPair(address indexed pair, bool indexed value);
 
@@ -56,10 +50,11 @@ contract SignataDAO is ERC20, ERC20Burnable, ERC20Snapshot, Ownable, ERC20Permit
         uniswapV2Pair = IUniswapV2Factory(_uniswapV2Router.factory()).createPair(address(this), _uniswapV2Router.WETH());
 
         isExcludedFromFees[msg.sender] = true;
-        automatedMarketMakerPairs[_uniswapV2Router] = true;
 
         _mint(msg.sender, 50000000 * 10 ** decimals());
     }
+
+    receive() external payable {}
 
     function snapshot() public onlyOwner {
         _snapshot();
@@ -111,50 +106,15 @@ contract SignataDAO is ERC20, ERC20Burnable, ERC20Snapshot, Ownable, ERC20Permit
         emit TransferFeeDisabled();
     }
 
-    function enableBuyFee() external onlyOwner {
-        require(!buyFeeEnabled, "enableBuyFee: buy fee already enabled");
-        buyFeeEnabled = true;
-        emit BuyFeeEnabled();
-    }
-
-    function disableBuyFee() external onlyOwner {
-        require(buyFeeEnabled, "disableBuyFee: buy fee already disabled");
-        buyFeeEnabled = false;
-        emit BuyFeeDisabled();
-    }
-
-    function enableSellFee() external onlyOwner {
-        require(!sellFeeEnabled, "enableSellFee: sell fee already enabled");
-        sellFeeEnabled = true;
-        emit SellFeeEnabled();
-    }
-
-    function disableSellFee() external onlyOwner {
-        require(sellFeeEnabled, "disableSellFee: sell fee already disabled");
-        sellFeeEnabled = false;
-        emit SellFeeDisabled();
-    }
-
-    function modifySwapTokensAmount(uint256 newAmount) external onlyOwner {
-        uint256 oldAmount = swapTokensAtAmount;
-        swapTokensAtAmount = newAmount;
-        emit ModifiedSwapTokensAtAmount(oldAmount, newAmount);
-    }
-
-    function modifyBuyFee(uint256 newAmount) external onlyOwner {
-        uint256 oldAmount = buyFee;
-        buyFee = newAmount;
-        emit ModifiedBuyFee(oldAmount, newAmount);
-    }
-
-    function modifySellFee(uint256 newAmount) external onlyOwner {
-        uint256 oldAmount = sellFee;
-        sellFee = newAmount;
-        emit ModifiedSellFee(oldAmount, newAmount);
+    function modifyFee(uint256 newAmount) external onlyOwner {
+        uint256 oldAmount = feeAmount;
+        feeAmount = newAmount;
+        emit ModifiedFee(oldAmount, newAmount);
     }
 
     function enableTrading() external onlyOwner {
         tradingActive = true;
+        antiSnipeEnabled = false;
         launchedAt = block.number;
     }
 
@@ -181,7 +141,6 @@ contract SignataDAO is ERC20, ERC20Burnable, ERC20Snapshot, Ownable, ERC20Permit
         emit SetAutomatedMarketMakerPair(pair, enabled);
     }
 
-
     function _transfer(address from, address to, uint256 amount) internal override {
         require(from != address(0), "_transfer: transfer from the zero address");
         require(to != address(0), "_transfer: transfer to the zero address");
@@ -189,7 +148,7 @@ contract SignataDAO is ERC20, ERC20Burnable, ERC20Snapshot, Ownable, ERC20Permit
         require(!blacklist[to], "_transfer: Recipient is blacklisted");
 
         if (amount == 0) {
-            super._transfer(from, to, 0);
+            _executeTransfer(from, to, 0);
             return;
         }
 
@@ -198,36 +157,23 @@ contract SignataDAO is ERC20, ERC20Burnable, ERC20Snapshot, Ownable, ERC20Permit
         }
 
         // anti bot logic
-        if (block.number <= (launchedAt + 1) && 
-            to != uniswapV2Pair && 
-            to != address(0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D)
-        ) {
-            blacklist[to] = true;
-            emit BoughtEarly(to);
+        if (antiSnipeEnabled) {
+            if (block.number <= (launchedAt + 1) && 
+                to != uniswapV2Pair && 
+                to != address(0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D)
+            ) {
+                blacklist[to] = true;
+                emit BoughtEarly(to);
+            }
         }
         
-        if (
-            !automatedMarketMakerPairs[from] && // no swap on remove liquidity step 1 or DEX buy
-            from != address(uniswapV2Router) && // no swap on remove liquidity step 2
-            from != owner() &&
-            to != owner() &&
-            !swapping &&
-        ) {
-            swapping = true;
-
-            _executeSwap(tokenBalance);
-
-            lastSwapTime = block.timestamp;
-            swapping = false;
-        }
-
         bool takeFee;
 
         if (
             from == address(uniswapV2Pair) ||
             to == address(uniswapV2Pair) ||
-            automatedMarketMakerPairs[to] ||
-            automatedMarketMakerPairs[from]
+            automatedMarketMakerPairs[from] ||
+            automatedMarketMakerPairs[to]
         ) {
             takeFee = true;
         }
@@ -241,30 +187,35 @@ contract SignataDAO is ERC20, ERC20Burnable, ERC20Snapshot, Ownable, ERC20Permit
             takeFee = false;
         }
 
-        // only take fees on buys/sells, do not take on wallet transfers
         if (takeFee) {
-            uint256 feesToTake;
-            
-            if (automatedMarketMakerPairs[to] && sellFeeEnabled) { // on sell
-                feesToTake = (amount * sellFee) / 10000;
-            } else if (automatedMarketMakerPairs[from] && buyFeeEnabled) { // on buy
-                feesToTake = (amount * buyFee) / 10000;
-            }
+            uint256 feesToTake = (amount / 10000) * feeAmount;
  
             if (feesToTake > 0) {
-                super._transfer(from, address(this), feesToTake);
+                _executeTransfer(from, address(this), feesToTake);
+                emit FeesTaken(feesToTake);
             }
  
             amount -= feesToTake;
         }
-        super._transfer(from, to, amount);
+        _executeTransfer(from, to, amount);
     }
 
-    function _executeSwap() private {
+    function _executeTransfer(address sender, address recipient, uint256 amount) private {
+        super._transfer(sender, recipient, amount);
+    }
+
+    function wouldPayFees(address toCheck) public view returns (bool) {
+        return toCheck == address(uniswapV2Pair) || automatedMarketMakerPairs[toCheck] || !isExcludedFromFees[toCheck];
+    }
+
+    function withdrawCollectedFees() public onlyOwner {
+        super._transfer(address(this), msg.sender, balanceOf(address(this)));
+    }
+
+    function swapCollectedFees() public onlyOwner {
+        swapping = true;
         uint256 tokenBalance = balanceOf(address(this));
-        if (tokenBalance <= 0 || tokenBalance < swapTokensAtAmount) {
-            return;
-        }
+
         bool success;
 
         // swap the tokens to native via uniswap
@@ -281,6 +232,10 @@ contract SignataDAO is ERC20, ERC20Burnable, ERC20Snapshot, Ownable, ERC20Permit
         );
 
         (success,) = address(feeNativeReceiver).call{value: address(this).balance}("");
+
+        lastSwapTime = block.timestamp;
+        swapping = false;
+        
         emit TaxesSwappedForNative(feeNativeReceiver);
     }
 }
