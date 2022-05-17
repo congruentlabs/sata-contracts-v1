@@ -18,7 +18,7 @@ contract GovernanceExchanger is Ownable {
         utilityToken = utilityToken_;
         holdingAccount = holdingAccount_;
 
-        endDate = block.timestamp + 14 days;
+        endDate = block.timestamp + 3 days;
     }
 
     function exchange(uint256 amount) external {
