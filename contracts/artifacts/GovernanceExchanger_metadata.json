@@ -189,35 +189,35 @@
 	},
 	"sources": {
 		"contracts/GovernanceExchanger.sol": {
-			"keccak256": "0xd4edbaa520203a91378a9f549954cc510323d6d73c664c4db35271438a073724",
+			"keccak256": "0xba6202ae5ce53fcea691e59eea8d528ee73d9a8367f37c7ec878399cf8e5cf14",
 			"license": "UNLICENSED",
 			"urls": [
-				"bzz-raw://949349dbdaf8d3605c850bdd685edf4da51677a4b74b4731e522440323819eac",
-				"dweb:/ipfs/QmQyruyiv22fcSfENguAFecHm6VL2EMQYGvFMmAF21911D"
+				"bzz-raw://e9f59fced090bad26eb6eff94661ee951d7f6968ec71f2f1c561179b6c8dad85",
+				"dweb:/ipfs/QmbRRSkrrqAhk8n4BoQk4KPz6JMatPd8ezapZKBC2SWdUt"
 			]
 		},
 		"contracts/openzeppelin/contracts/access/Ownable.sol": {
-			"keccak256": "0x24e0364e503a9bbde94c715d26573a76f14cd2a202d45f96f52134ab806b67b9",
+			"keccak256": "0xd2bd30ee25ef65894d0a4f974eb71cc59907d62ab26fe1d2e96e5b4572178d8f",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://e12cbaa7378fd9b62280e4e1d164bedcb4399ce238f5f98fc0eefb7e50577981",
-				"dweb:/ipfs/QmXRoFGUgfsaRkoPT5bxNMtSayKTQ8GZATLPXf69HcRA51"
+				"bzz-raw://4a250ef83b73a9a8e4f89afdfc140f0dcf4443a1753b3d1456445dc9662a1198",
+				"dweb:/ipfs/QmavLfbnmjjSSWWjd6ouNok7mcj7XtCnX7DkLaDZP8qykj"
 			]
 		},
 		"contracts/openzeppelin/contracts/token/ERC20/IERC20.sol": {
-			"keccak256": "0xbbc8ac883ac3c0078ce5ad3e288fbb3ffcc8a30c3a98c0fda0114d64fc44fca2",
+			"keccak256": "0x56464c6d25cbc9d1f0759ae32b1df69ea33864f2b9e2d70209d8bc5b5e146f9a",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://87a7a5d2f6f63f84598af02b8c50ca2df2631cb8ba2453e8d95fcb17e4be9824",
-				"dweb:/ipfs/QmR76hqtAcRqoFj33tmNjcWTLrgNsAaakYwnKZ8zoJtKei"
+				"bzz-raw://4d340140d7d51fee4972b432b1818270b0d3366fcc5b0c93978b634d66208e04",
+				"dweb:/ipfs/QmZNfx4JWdqUfNZvtewEr5UKwvSDbLMrrHPoPzbZLV4G9d"
 			]
 		},
 		"contracts/openzeppelin/contracts/utils/Context.sol": {
-			"keccak256": "0xe2e337e6dde9ef6b680e07338c493ebea1b5fd09b43424112868e9cc1706bca7",
+			"keccak256": "0x81d5fc973a522c8909d60be6a201869d46aa47b030b8813f60616404628c2b94",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://6df0ddf21ce9f58271bdfaa85cde98b200ef242a05a3f85c2bc10a8294800a92",
-				"dweb:/ipfs/QmRK2Y5Yc6BK7tGKkgsgn3aJEQGi5aakeSPZvS65PV8Xp3"
+				"bzz-raw://9755b505799e622d964a843a8ed1fd60fedffca230178e5cb95ae9280df4dcd2",
+				"dweb:/ipfs/QmRkhUYUUgRZ2QYJjmtQct2ubyYwS3bdUMhbuFYM12VfYn"
 			]
 		}
 	},
