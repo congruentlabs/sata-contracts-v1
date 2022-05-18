@@ -1,17 +1,18 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.4;
+pragma solidity ^0.8.13;
 
-import "@openzeppelin/contracts/governance/Governor.sol";
-import "@openzeppelin/contracts/governance/extensions/GovernorSettings.sol";
-import "@openzeppelin/contracts/governance/extensions/GovernorCountingSimple.sol";
-import "@openzeppelin/contracts/governance/extensions/GovernorVotes.sol";
-import "@openzeppelin/contracts/governance/extensions/GovernorVotesQuorumFraction.sol";
-import "@openzeppelin/contracts/governance/extensions/GovernorTimelockControl.sol";
+import "./openzeppelin/contracts/governance/Governor.sol";
+import "./openzeppelin/contracts/governance/IGovernor.sol";
+import "./openzeppelin/contracts/governance/extensions/GovernorSettings.sol";
+import "./openzeppelin/contracts/governance/compatibility/GovernorCompatibilityBravo.sol";
+import "./openzeppelin/contracts/governance/extensions/GovernorVotes.sol";
+import "./openzeppelin/contracts/governance/extensions/GovernorVotesQuorumFraction.sol";
+import "./openzeppelin/contracts/governance/extensions/GovernorTimelockControl.sol";
 
-contract SignataGovernor is Governor, GovernorSettings, GovernorCountingSimple, GovernorVotes, GovernorVotesQuorumFraction, GovernorTimelockControl {
+contract SignataGovernor is Governor, GovernorSettings, GovernorCompatibilityBravo, GovernorVotes, GovernorVotesQuorumFraction, GovernorTimelockControl { 
     constructor(IVotes _token, TimelockController _timelock)
         Governor("Signata Governor")
-        GovernorSettings(1 /* 1 block */, 19636 /* 3 days */, 0)
+        GovernorSettings(6545 /* 1 day */, 45818 /* 7 days */, 1)
         GovernorVotes(_token)
         GovernorVotesQuorumFraction(4)
         GovernorTimelockControl(_timelock)
@@ -49,7 +50,7 @@ contract SignataGovernor is Governor, GovernorSettings, GovernorCountingSimple, 
     function getVotes(address account, uint256 blockNumber)
         public
         view
-        override(IGovernor, GovernorVotes)
+        override(Governor, IGovernor)
         returns (uint256)
     {
         return super.getVotes(account, blockNumber);
@@ -58,7 +59,7 @@ contract SignataGovernor is Governor, GovernorSettings, GovernorCountingSimple, 
     function state(uint256 proposalId)
         public
         view
-        override(Governor, GovernorTimelockControl)
+        override(Governor, IGovernor, GovernorTimelockControl)
         returns (ProposalState)
     {
         return super.state(proposalId);
@@ -66,7 +67,7 @@ contract SignataGovernor is Governor, GovernorSettings, GovernorCountingSimple, 
 
     function propose(address[] memory targets, uint256[] memory values, bytes[] memory calldatas, string memory description)
         public
-        override(Governor, IGovernor)
+        override(Governor, GovernorCompatibilityBravo, IGovernor)
         returns (uint256)
     {
         return super.propose(targets, values, calldatas, description);
@@ -108,7 +109,7 @@ contract SignataGovernor is Governor, GovernorSettings, GovernorCountingSimple, 
     function supportsInterface(bytes4 interfaceId)
         public
         view
-        override(Governor, GovernorTimelockControl)
+        override(Governor, IERC165, GovernorTimelockControl)
         returns (bool)
     {
         return super.supportsInterface(interfaceId);
