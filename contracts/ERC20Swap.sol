@@ -49,7 +49,7 @@ contract VeriswapERC20 is Ownable {
       bool _requireIdentity
     ) public {
         if (_requireIdentity) {
-            require(!signataIdentity.isLocked(msg.sender), "open::creator must not be locked.");
+            require(!signataIdentity.isLocked(msg.sender), "createSwap::creator must not be locked.");
             // don't check the executor yet, just in case they go and register after the fact.
         }
         AtomicSwap memory swapToCheck = swaps[msg.sender];
@@ -58,10 +58,10 @@ contract VeriswapERC20 is Ownable {
         IERC20 inputToken = IERC20(_inputToken);
 
         // check allowance
-        require(_inputAmount <= inputToken.allowance(msg.sender, address(this)));
+        require(_inputAmount <= inputToken.allowance(msg.sender, address(this)), "createSwap::insufficient allowance");
 
         // transfer into escrow
-        require(inputToken.transferFrom(msg.sender, address(this), _inputAmount));
+        require(inputToken.transferFrom(msg.sender, address(this), _inputAmount), "createSwap::transferFrom failed");
 
         // store the details
         AtomicSwap memory newSwap = AtomicSwap({
@@ -104,7 +104,7 @@ contract VeriswapERC20 is Ownable {
       // send the input to the executor
       require(inputToken.transfer(swapToExecute.executor, swapToExecute.inputAmount));
       // send the output to the creator
-      require(outputToken.transfer(swapToExecute.creator, swapToExecute.outputAmount));
+      require(outputToken.transferFrom(msg.sender, swapToExecute.creator, swapToExecute.outputAmount));
 
       // send the parties their respective tokens
       emit SwapExecuted(creatorAddress);
