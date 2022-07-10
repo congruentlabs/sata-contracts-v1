@@ -3,9 +3,10 @@ pragma solidity ^0.8.14;
 
 import "./openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./openzeppelin/contracts/access/Ownable.sol";
+import "./openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "./SignataIdentity.sol";
 
-contract VeriswapERC20 is Ownable {
+contract VeriswapERC20 is Ownable, ReentrancyGuard {
     SignataIdentity public signataIdentity;
 
     enum States {
@@ -26,7 +27,7 @@ contract VeriswapERC20 is Ownable {
       States state;
     }
 
-    bool public canSwap;
+    bool public canSwap = true;
 
     mapping (address => AtomicSwap) public swaps;
 
@@ -79,7 +80,7 @@ contract VeriswapERC20 is Ownable {
         emit SwapCreated(newSwap);
     }
 
-    function executeSwap(address creatorAddress) public {
+    function executeSwap(address creatorAddress) nonReentrant external {
       require(canSwap, "executeSwap::swaps not enabled!");
 
       // check the state
@@ -110,7 +111,7 @@ contract VeriswapERC20 is Ownable {
       emit SwapExecuted(creatorAddress);
     }
 
-    function cancelSwap() public {
+    function cancelSwap() nonReentrant external {
       AtomicSwap memory swapToCancel = swaps[msg.sender];
       require(swapToCancel.creator == msg.sender, "cancelSwap::not the creator.");
       require(swapToCancel.state == States.OPEN, "cancelSwap::not an open swap.");
@@ -124,7 +125,7 @@ contract VeriswapERC20 is Ownable {
       emit SwapCancelled(swapToCancel.creator);
     }
 
-    function changeExecutor(address newExecutor) public {
+    function changeExecutor(address newExecutor) external {
       require(newExecutor != address(0), "changeExecutor::cannot set to 0 address!");
       AtomicSwap memory swapToChange = swaps[msg.sender];
 
@@ -139,89 +140,11 @@ contract VeriswapERC20 is Ownable {
       emit ExecutorModified(msg.sender, oldExecutor, newExecutor);
     }
 
-    function enableSwaps() public onlyOwner { canSwap = true; }
-    function disableSwaps() public onlyOwner { canSwap = false; }
+    function enableSwaps() external onlyOwner { canSwap = true; }
+    function disableSwaps() external onlyOwner { canSwap = false; }
     
-    function updateSignataIdentity(SignataIdentity newIdentity) public onlyOwner {
+    function updateSignataIdentity(SignataIdentity newIdentity) external onlyOwner {
         signataIdentity = newIdentity;
         emit IdentityContractChanged(newIdentity);
     }
-
-    // function open(
-    //     bytes32 _swapID,
-    //     uint256 _erc20Value,
-    //     address _erc20ContractAddress,
-    //     address _withdrawTrader,
-    //     bytes32 _secretLock,
-    //     uint256 _timelock,
-    //     bool _requireIdentity
-    // ) public onlyInvalidSwaps(_swapID) {
-    //     require(swapStates[_swapID] == States.INVALID);
-    //     if (_requireIdentity) {
-    //         require(!signataIdentity.isLocked(msg.sender), "open::Sender must not be locked.");
-    //         require(!signataIdentity.isLocked(_withdrawTrader), "open::Trader must not be locked.");
-    //     }
-
-    //     // Transfer value from the ERC20 trader to this contract.
-    //     ERC20 erc20Contract = ERC20(_erc20ContractAddress);
-    //     require(_erc20Value <= erc20Contract.allowance(msg.sender, address(this)));
-    //     require(erc20Contract.transferFrom(msg.sender, address(this), _erc20Value));
-
-    //     // Store the details of the swap.
-    //     Swap memory swap = Swap({
-    //         timelock: _timelock,
-    //         erc20Value: _erc20Value,
-    //         erc20Trader: msg.sender,
-    //         erc20ContractAddress: _erc20ContractAddress,
-    //         withdrawTrader: _withdrawTrader,
-    //         secretLock: _secretLock,
-    //         secretKey: new bytes(0),
-    //         checkIdentity: _requireIdentity
-    //     });
-    //     swaps[_swapID] = swap;
-    //     swapStates[_swapID] = States.OPEN;
-    //     emit Open(_swapID, _withdrawTrader, _secretLock);
-    // }
-
-    // function close(bytes32 _swapID, bytes memory _secretKey) public onlyOpenSwaps(_swapID)
-    //     onlyWithSecretKey(_swapID, _secretKey) {
-
-    //     // Close the swap.
-    //     Swap memory swap = swaps[_swapID];
-    //     swaps[_swapID].secretKey = _secretKey;
-    //     swapStates[_swapID] = States.CLOSED;
-
-    //     if (swap.checkIdentity) {
-    //         require(!signataIdentity.isLocked(swap.erc20Trader), "close::Account must not be locked.");
-    //     }
-
-    //     // Transfer the ERC20 funds from this contract to the withdrawing trader.
-    //     ERC20 erc20Contract = ERC20(swap.erc20ContractAddress);
-    //     require(erc20Contract.transfer(swap.withdrawTrader, swap.erc20Value));
-
-    //     emit Close(_swapID, _secretKey);
-    // }
-
-    // function expire(bytes32 _swapID) public onlyOpenSwaps(_swapID) onlyExpirableSwaps(_swapID) {
-    //     // Expire the swap.
-    //     Swap memory swap = swaps[_swapID];
-    //     swapStates[_swapID] = States.EXPIRED;
-
-    //     // Transfer the ERC20 value from this contract back to the ERC20 trader.
-    //     ERC20 erc20Contract = ERC20(swap.erc20ContractAddress);
-    //     require(erc20Contract.transfer(swap.erc20Trader, swap.erc20Value));
-
-    //     emit Expire(_swapID);
-    // }
-
-    // function check(bytes32 _swapID) public view returns (uint256 timelock, uint256 erc20Value,
-    //     address erc20ContractAddress, address withdrawTrader, bytes32 secretLock) {
-    //     Swap memory swap = swaps[_swapID];
-    //     return (swap.timelock, swap.erc20Value, swap.erc20ContractAddress, swap.withdrawTrader, swap.secretLock);
-    // }
-
-    // function checkSecretKey(bytes32 _swapID) public view onlyClosedSwaps(_swapID) returns (bytes memory secretKey) {
-    //     Swap memory swap = swaps[_swapID];
-    //     return swap.secretKey;
-    // }
 }
