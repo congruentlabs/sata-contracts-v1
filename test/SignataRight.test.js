@@ -15,7 +15,7 @@ const { expect } = require("chai");
 const SignataIdentity = contract.fromArtifact("SignataIdentity");
 const SignataRight = contract.fromArtifact("SignataRight");
 
-const CHAINID = 1;
+const CHAINID = 4;
 var IDENTITY_CONTRACT_ADDRESS;
 var RIGHTS_CONTRACT_ADDRESS;
 var DOMAIN_SEPARATOR;
