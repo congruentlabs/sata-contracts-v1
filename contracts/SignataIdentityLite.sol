@@ -3,9 +3,13 @@
 pragma solidity ^0.8.15;
 
 import "./openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "./openzeppelin/contracts/access/Ownable.sol";
+import "./openzeppelin/contracts/access/AccessControl.sol";
 
-abstract contract IdentityStandard {
+/*
+This is the lite version of the Signata Identity contract. There is no delegate or security key, only the caller or a specified delegate address can make changes.
+*/
+contract SignataIdentityLite is AccessControl {
+    IERC20 public identityToken;
     mapping(address => uint256) public _identityLockCount;
     mapping(address => uint256) public _identityRolloverCount;
     mapping(address => address) public _identityDelegate;
@@ -13,31 +17,17 @@ abstract contract IdentityStandard {
     mapping(address => bool) public _identityExists;
     mapping(address => bool) public _identityLocked;
 
-    modifier notLocked() {
-        require(!_identityLocked[msg.sender], "SignataIdentity: The identity must not be locked.");
-        _;
-    }
+    uint256 public minimumBalance = 10e18;
+    uint256 public nonHolderFee = 0.005 ether;
 
-    modifier notDestroyed() {
-        require(!_identityDestroyed[msg.sender], "SignataIdentity: The identity must not be destroyed.");
-        _;
-    }
+    bytes32 public constant DELEGATE_ROLE = keccak256("DELEGATE_ROLE");
+    bytes32 public constant MODIFIER_ROLE = keccak256("MODIFIER_ROLE");
 
-    modifier identityExists() {
-        require(_identityExists[msg.sender], "SignataIdentity: The identity must exist.");
-        _;
-    }
-}
-
-/*
-This is the lite version of the Signata Identity contract. There is no delegate or security key, only the caller or a specified delegate address can make changes.
-*/
-contract SignataIdentityLite is Ownable, IdentityStandard {
-    IERC20 public signataToken;
+    mapping(address => bool) public _authorizedDelegates;
   
-    constructor() {}
-
-    receive() external payable {}
+    constructor() {
+        grantRole(keccak256("DEFAULT_ADMIN_ROLE"), msg.sender);
+    }
 
     event Create(address indexed identity);
     event Destroy(address indexed identity);
@@ -45,8 +35,74 @@ contract SignataIdentityLite is Ownable, IdentityStandard {
     event Rollover(address indexed identity);
     event Unlock(address indexed identity);
     event DelegateSet(address indexed delegate);
+    event NonHolderFeeUpdated(uint256 newAmount);
+    event MinimumBalanceUpdated(uint256 newAmount);
+    event NativeWithdrawn(address to);
+    event IdentityTokenUpdated(address indexed newAddress);
 
-    function create() external payable {
+    modifier isDelegateFor(address subject) {
+        require(
+            _identityDelegate[subject] == msg.sender,
+            "SignataIdentityLite: Not the delegate address"
+        );
+        _;
+    }
+
+    modifier notLocked(address subject) {
+        require(
+            !_identityLocked[subject],
+            "SignataIdentityLite: The identity must not be locked."
+        );
+        _;
+    }
+
+    modifier isLocked(address subject) {
+        require(
+            _identityLocked[subject],
+            "SignataIdentityLite: The identity must be locked."
+        );
+        _;
+    }
+
+    modifier notDestroyed(address subject) {
+        require(
+            !_identityDestroyed[subject],
+            "SignataIdentityLite: The identity must not be destroyed."
+        );
+        _;
+    }
+
+    modifier isIdentity(address subject) {
+        require(
+            _identityExists[subject],
+            "SignataIdentityLite: The identity must exist."
+        );
+        _;
+    }
+
+    modifier notIdentity(address subject) {
+        require(
+            !_identityExists[subject],
+            "SignataIdentityLite: The identity must not exist."
+        );
+        _;
+    }
+
+    modifier notReachedLimit(address subject) {
+                require(
+            _identityLockCount[subject] != type(uint256).max,
+            "SignataIdentityLite: The identity is permanently locked."
+        );
+    _;
+    }
+
+    receive() external payable {}
+
+    // create identity, charging native if they don't hold the identity token
+    function create()
+        external
+        payable
+    {
         require(
             !_identityExists[msg.sender],
             "SignataIdentityLite: The identity must not already exist."
@@ -54,64 +110,137 @@ contract SignataIdentityLite is Ownable, IdentityStandard {
 
         bool takeFee = true;
 
-        if (signataToken.balanceOf(msg.sender) > 10e18) {
+        if (identityToken.balanceOf(msg.sender) > minimumBalance) {
             takeFee = false;
         }
 
         if (takeFee) {
-            (bool success, ) = payable(address(this)).transfer(msg.sender), 10e18);
+            (bool success, ) = payable(address(this)).call{ value: nonHolderFee }(""); 
+            require(success, "SignataIdentityLite: Payment not recieved.");
         }
         
         _identityExists[msg.sender] = true;
-        s
+        _identityDelegate[msg.sender] = msg.sender; // self delegate to start with
+
         emit Create(msg.sender);
     }
-    
-    function setDelegate(address delegate) external identityExists notLocked notDestroyed {
-        _identityDelegate[msg.sender] = delegate;
 
+    function createAsDelegate(address subject)
+        external
+        onlyRole(DELEGATE_ROLE)
+        notIdentity(subject)
+    {
+        _identityExists[subject] = true;
+        _identityDelegate[subject] = msg.sender;
+
+        emit Create(subject);
+    }
+
+    function setDelegate(address delegate)
+        external
+        isIdentity(msg.sender)
+        notLocked(msg.sender)
+        notDestroyed(msg.sender)
+    {
+        require(hasRole(DELEGATE_ROLE, delegate), "SignataIdentityLite: Delegate address not assigned DELEGATE_ROLE.");
+        _identityDelegate[msg.sender] = delegate;
         emit DelegateSet(delegate);
     }
-    
-    function destroy() external identityExists notDestroyed {        
-        _identityDestroyed[msg.sender] = true;
-        
-        emit Destroy(msg.sender);
-    }
-    
-    function lock() external identityExists notLocked notDestroyed {        
+
+    function lock()
+        external
+        isIdentity(msg.sender)
+        notLocked(msg.sender)
+        notDestroyed(msg.sender)
+    {
         _identityLocked[msg.sender] = true;
-        _identityLockCount[msg.sender] += 1;
-        
         emit Lock(msg.sender);
     }
 
-    function unlock() external identityExists notDestroyed {
-        require(
-            _identityLocked[msg.sender],
-            "SignataIdentityLite: The identity is already unlocked."
-        );
-        
-        require(
-            _identityLockCount[msg.sender] != MAX_UINT256,
-            "SignataIdentityLite: The identity is permanently locked."
-        );
-
-        require(
-            _identityDelegate[msg.sender],
-            "SignataIdentityLite: Not the delegate address."
-        );
-
+    function unlock()
+        external
+        isIdentity(msg.sender)
+        notDestroyed(msg.sender)
+        isLocked(msg.sender)
+    {
         _identityLocked[msg.sender] = false;
-        
         emit Unlock(msg.sender);
     }
 
-    function updateSignataToken(address newToken) external onlyOwner {
-        signataToken = newToken;
+    function destroy()
+        external
+        isIdentity(msg.sender)
+        notDestroyed(msg.sender)
+    {
+        _identityDestroyed[msg.sender] = true;
+        emit Destroy(msg.sender);
     }
 
-    function withdrawEth(address to) external onlyOwner {
-        (bool success, ) = payable(recipient).transfer(address(this).balance);
+    function delegateLock(address subject)
+        external
+        onlyRole(DELEGATE_ROLE)
+        isIdentity(subject)
+        notLocked(subject)
+        notDestroyed(subject)
+        isDelegateFor(subject)
+    {
+        _identityLocked[subject] = true;
+        emit Lock(subject);
+    }
+
+    function delegateUnlock(address subject)
+        external
+        onlyRole(DELEGATE_ROLE)
+        isIdentity(subject)
+        isLocked(subject)
+        notDestroyed(subject)
+        isDelegateFor(subject)
+    {
+        _identityLocked[subject] = false;
+        emit Unlock(subject);
+    }
+
+    function delegateDestroy(address subject)
+        external
+        onlyRole(DELEGATE_ROLE)
+        isIdentity(subject)
+        notLocked(subject)
+        notDestroyed(subject)
+        isDelegateFor(subject)
+    {
+        _identityDestroyed[subject] = true;
+        emit Destroy(subject);
+    }
+
+    function updateIdentityToken(address newToken)
+        external
+        onlyRole(MODIFIER_ROLE)
+    {
+        identityToken = IERC20(newToken);
+        emit IdentityTokenUpdated(newToken);
+    }
+
+    function withdraw(address to)
+        external 
+        onlyRole(MODIFIER_ROLE)
+    {
+        (bool success, ) = payable(to).call{ value: address(this).balance }("");
+        emit NativeWithdrawn(to);
+    }
+    
+    function updateMinimumBalance(uint256 newAmount)
+        external 
+        onlyRole(MODIFIER_ROLE)
+    {
+        minimumBalance = newAmount;
+        emit MinimumBalanceUpdated(newAmount);
+    }
+
+    function updateNonHolderFee(uint256 newAmount)
+        external 
+        onlyRole(MODIFIER_ROLE)
+    {
+        nonHolderFee = newAmount;
+        emit NonHolderFeeUpdated(newAmount);
     }
 }
