@@ -2,120 +2,91 @@
 
 pragma solidity ^0.8.15;
 
-/*
-This is the lite version of the 
-*/
-contract SignataIdentityLite {
-    uint256 private constant MAX_UINT256 = type(uint256).max;
-    
-    // keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract,bytes32 salt)")
-    bytes32 private constant EIP712DOMAINTYPE_DIGEST = 0xd87cd6ef79d4e2b95e15ce8abf732db51ec771f1ca2edccf22a46c729ac56472;
-    
-    // keccak256("Signata")
-    bytes32 private constant NAME_DIGEST = 0xfc8e166e81add347414f67a8064c94523802ae76625708af4cddc107b656844f;
-    
-    // keccak256("1")
-    bytes32 private constant VERSION_DIGEST = 0xc89efdaa54c0f20c7adf612882df0950f5a951637e0307cdcb4c672f298b8bc6;
+import "./openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "./openzeppelin/contracts/access/Ownable.sol";
 
-    bytes32 private constant SALT = 0x233cdb81615d25013bb0519fbe69c16ddc77f9fa6a9395bd2aecfdfc1c0896e3;
-    
-    bytes32 private immutable _domainSeperator;
-    
-    // storage
+abstract contract IdentityStandard {
     mapping(address => uint256) public _identityLockCount;
     mapping(address => uint256) public _identityRolloverCount;
+    mapping(address => address) public _identityDelegate;
     mapping(address => bool) public _identityDestroyed;
     mapping(address => bool) public _identityExists;
     mapping(address => bool) public _identityLocked;
-    mapping(address => address) public _identityDelegate;
-    
-    constructor(uint256 chainId) {
-        _domainSeperator = keccak256(
-            abi.encode(
-                EIP712DOMAINTYPE_DIGEST,
-                NAME_DIGEST,
-                VERSION_DIGEST,
-                chainId,
-                this,
-                SALT
-            )
-        );
+
+    modifier notLocked() {
+        require(!_identityLocked[msg.sender], "SignataIdentity: The identity must not be locked.");
+        _;
     }
-    
+
+    modifier notDestroyed() {
+        require(!_identityDestroyed[msg.sender], "SignataIdentity: The identity must not be destroyed.");
+        _;
+    }
+
+    modifier identityExists() {
+        require(_identityExists[msg.sender], "SignataIdentity: The identity must exist.");
+        _;
+    }
+}
+
+/*
+This is the lite version of the Signata Identity contract. There is no delegate or security key, only the caller or a specified delegate address can make changes.
+*/
+contract SignataIdentityLite is Ownable, IdentityStandard {
+    IERC20 public signataToken;
+  
+    constructor() {}
+
+    receive() external payable {}
+
     event Create(address indexed identity);
     event Destroy(address indexed identity);
     event Lock(address indexed identity);
     event Rollover(address indexed identity);
     event Unlock(address indexed identity);
-    
-    function create() external {
+    event DelegateSet(address indexed delegate);
+
+    function create() external payable {
         require(
             !_identityExists[msg.sender],
             "SignataIdentityLite: The identity must not already exist."
         );
+
+        bool takeFee = true;
+
+        if (signataToken.balanceOf(msg.sender) > 10e18) {
+            takeFee = false;
+        }
+
+        if (takeFee) {
+            (bool success, ) = payable(address(this)).transfer(msg.sender), 10e18);
+        }
         
         _identityExists[msg.sender] = true;
-        
+        s
         emit Create(msg.sender);
     }
     
-    function setDelegate(address delegate) external {
-
+    function setDelegate(address delegate) external identityExists notLocked notDestroyed {
         _identityDelegate[msg.sender] = delegate;
+
+        emit DelegateSet(delegate);
     }
     
-    function destroy() external {
-        require(
-            _identityExists[msg.sender],
-            "SignataIdentityLite: The identity must exist."
-        );
-        
-        require(
-            !_identityDestroyed[msg.sender],
-            "SignataIdentityLite: The identity has already been destroyed."
-        );
-        
+    function destroy() external identityExists notDestroyed {        
         _identityDestroyed[msg.sender] = true;
-        
         
         emit Destroy(msg.sender);
     }
     
-    function lock() external {
-        require(
-            _identityExists[msg.sender],
-            "SignataIdentityLite: The identity must exist."
-        );
-        
-        require(
-            !_identityDestroyed[msg.sender],
-            "SignataIdentityLite: The identity has been destroyed."
-        );
-        
-        require(
-            !_identityLocked[msg.sender],
-            "SignataIdentityLite: The identity has already been locked."
-        );
-        
+    function lock() external identityExists notLocked notDestroyed {        
         _identityLocked[msg.sender] = true;
         _identityLockCount[msg.sender] += 1;
         
         emit Lock(msg.sender);
     }
 
-    function unlock()
-        external 
-    {
-        require(
-            _identityExists[msg.sender],
-            "SignataIdentityLite: The identity must exist."
-        );
-        
-        require(
-            !_identityDestroyed[msg.sender],
-            "SignataIdentityLite: The identity has been destroyed."
-        );
-        
+    function unlock() external identityExists notDestroyed {
         require(
             _identityLocked[msg.sender],
             "SignataIdentityLite: The identity is already unlocked."
@@ -136,57 +107,11 @@ contract SignataIdentityLite {
         emit Unlock(msg.sender);
     }
 
-    function getLockCount(address identity)
-        external
-        view
-        returns (uint256) 
-    {
-         require(
-            _identityExists[identity],
-            "SignataIdentityLite: The identity must exist."
-        );
-        
-        require(
-            !_identityDestroyed[identity],
-            "SignataIdentityLite: The identity has been destroyed."
-        );
-        
-        return _identityLockCount[identity];
+    function updateSignataToken(address newToken) external onlyOwner {
+        signataToken = newToken;
     }
 
-    function getRolloverCount(address identity)
-        external
-        view
-        returns (uint256) 
-    {
-        require(
-            _identityExists[identity],
-            "SignataIdentityLite: The identity must exist."
-        );
-        
-        require(
-            !_identityDestroyed[identity],
-            "SignataIdentityLite: The identity has been destroyed."
-        );
-        
-        return _identityRolloverCount[identity];
-    }
-    
-    function isLocked(address identity)
-        external
-        view
-        returns (bool) 
-    {
-        require(
-            _identityExists[identity],
-            "SignataIdentityLite: The identity must exist."
-        );
-        
-        require(
-            !_identityDestroyed[identity],
-            "SignataIdentityLite: The identity has been destroyed."
-        );
-        
-        return _identityLocked[identity];
+    function withdrawEth(address to) external onlyOwner {
+        (bool success, ) = payable(recipient).transfer(address(this).balance);
     }
 }
