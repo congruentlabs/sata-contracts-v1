@@ -18,7 +18,7 @@ contract SignataIdentityLite is AccessControl {
     mapping(address => bool) public _identityLocked;
 
     uint256 public minimumBalance = 10e18;
-    uint256 public nonHolderFee = 0.005 ether;
+    uint256 public nonHolderFee = 5e15; // 0.005 ETH
 
     bytes32 public constant DELEGATE_ROLE = keccak256("DELEGATE_ROLE");
     bytes32 public constant MODIFIER_ROLE = keccak256("MODIFIER_ROLE");
@@ -116,7 +116,7 @@ contract SignataIdentityLite is AccessControl {
 
         if (takeFee) {
             (bool success, ) = payable(address(this)).call{ value: nonHolderFee }(""); 
-            require(success, "SignataIdentityLite: Payment not recieved.");
+            require(success, "SignataIdentityLite: Payment not received.");
         }
         
         _identityExists[msg.sender] = true;
@@ -142,7 +142,10 @@ contract SignataIdentityLite is AccessControl {
         notLocked(msg.sender)
         notDestroyed(msg.sender)
     {
-        require(hasRole(DELEGATE_ROLE, delegate), "SignataIdentityLite: Delegate address not assigned DELEGATE_ROLE.");
+        require(
+            hasRole(DELEGATE_ROLE, delegate),
+            "SignataIdentityLite: Delegate address not assigned DELEGATE_ROLE."
+        );
         _identityDelegate[msg.sender] = delegate;
         emit DelegateSet(delegate);
     }
@@ -204,7 +207,6 @@ contract SignataIdentityLite is AccessControl {
         external
         onlyRole(DELEGATE_ROLE)
         isIdentity(subject)
-        notLocked(subject)
         notDestroyed(subject)
         isDelegateFor(subject)
     {
@@ -225,6 +227,7 @@ contract SignataIdentityLite is AccessControl {
         onlyRole(MODIFIER_ROLE)
     {
         (bool success, ) = payable(to).call{ value: address(this).balance }("");
+        require(success, "SignataIdentityLite: Withdraw failed.");
         emit NativeWithdrawn(to);
     }
     
