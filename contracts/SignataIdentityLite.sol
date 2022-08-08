@@ -9,11 +9,9 @@ import "./openzeppelin/contracts/access/AccessControl.sol";
 This is the lite version of the Signata Identity contract. There is no delegate or security key, only the caller or a specified delegate address can make changes.
 */
 contract SignataIdentityLite is AccessControl {
-    IERC20 public identityToken;
-    mapping(address => uint256) public _identityLockCount;
+    IERC20 public _identityToken;
     mapping(address => uint256) public _identityRolloverCount;
     mapping(address => address) public _identityDelegate;
-    mapping(address => bool) public _identityDestroyed;
     mapping(address => bool) public _identityExists;
     mapping(address => bool) public _identityLocked;
 
@@ -25,12 +23,16 @@ contract SignataIdentityLite is AccessControl {
 
     mapping(address => bool) public _authorizedDelegates;
   
-    constructor() {
-        grantRole(keccak256("DEFAULT_ADMIN_ROLE"), msg.sender);
+    constructor(address identityToken) {
+        _identityToken = IERC20(identityToken);
+        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _setupRole(DELEGATE_ROLE, msg.sender);
+        _setRoleAdmin(DELEGATE_ROLE, DEFAULT_ADMIN_ROLE);
+        _setupRole(MODIFIER_ROLE, msg.sender);
+        _setRoleAdmin(MODIFIER_ROLE, DEFAULT_ADMIN_ROLE);
     }
 
     event Create(address indexed identity);
-    event Destroy(address indexed identity);
     event Lock(address indexed identity);
     event Rollover(address indexed identity);
     event Unlock(address indexed identity);
@@ -39,6 +41,7 @@ contract SignataIdentityLite is AccessControl {
     event MinimumBalanceUpdated(uint256 newAmount);
     event NativeWithdrawn(address to);
     event IdentityTokenUpdated(address indexed newAddress);
+    event DelegateAdded(address indexed newAddress);
 
     modifier isDelegateFor(address subject) {
         require(
@@ -64,14 +67,6 @@ contract SignataIdentityLite is AccessControl {
         _;
     }
 
-    modifier notDestroyed(address subject) {
-        require(
-            !_identityDestroyed[subject],
-            "SignataIdentityLite: The identity must not be destroyed."
-        );
-        _;
-    }
-
     modifier isIdentity(address subject) {
         require(
             _identityExists[subject],
@@ -88,14 +83,6 @@ contract SignataIdentityLite is AccessControl {
         _;
     }
 
-    modifier notReachedLimit(address subject) {
-                require(
-            _identityLockCount[subject] != type(uint256).max,
-            "SignataIdentityLite: The identity is permanently locked."
-        );
-    _;
-    }
-
     receive() external payable {}
 
     // create identity, charging native if they don't hold the identity token
@@ -110,7 +97,7 @@ contract SignataIdentityLite is AccessControl {
 
         bool takeFee = true;
 
-        if (identityToken.balanceOf(msg.sender) > minimumBalance) {
+        if (_identityToken.balanceOf(msg.sender) > minimumBalance) {
             takeFee = false;
         }
 
@@ -140,7 +127,6 @@ contract SignataIdentityLite is AccessControl {
         external
         isIdentity(msg.sender)
         notLocked(msg.sender)
-        notDestroyed(msg.sender)
     {
         require(
             hasRole(DELEGATE_ROLE, delegate),
@@ -150,75 +136,42 @@ contract SignataIdentityLite is AccessControl {
         emit DelegateSet(delegate);
     }
 
-    function lock()
+    function selfLock()
         external
         isIdentity(msg.sender)
         notLocked(msg.sender)
-        notDestroyed(msg.sender)
     {
         _identityLocked[msg.sender] = true;
         emit Lock(msg.sender);
     }
 
-    function unlock()
-        external
-        isIdentity(msg.sender)
-        notDestroyed(msg.sender)
-        isLocked(msg.sender)
-    {
-        _identityLocked[msg.sender] = false;
-        emit Unlock(msg.sender);
-    }
-
-    function destroy()
-        external
-        isIdentity(msg.sender)
-        notDestroyed(msg.sender)
-    {
-        _identityDestroyed[msg.sender] = true;
-        emit Destroy(msg.sender);
-    }
-
-    function delegateLock(address subject)
+    function lock(address subject)
         external
         onlyRole(DELEGATE_ROLE)
         isIdentity(subject)
         notLocked(subject)
-        notDestroyed(subject)
         isDelegateFor(subject)
     {
         _identityLocked[subject] = true;
         emit Lock(subject);
     }
 
-    function delegateUnlock(address subject)
+    function unlock(address subject)
         external
         onlyRole(DELEGATE_ROLE)
         isIdentity(subject)
         isLocked(subject)
-        notDestroyed(subject)
         isDelegateFor(subject)
     {
         _identityLocked[subject] = false;
         emit Unlock(subject);
     }
 
-    function delegateDestroy(address subject)
-        external
-        onlyRole(DELEGATE_ROLE)
-        isIdentity(subject)
-        notDestroyed(subject)
-        isDelegateFor(subject)
-    {
-        _identityDestroyed[subject] = true;
-        emit Destroy(subject);
-    }
-
     function updateIdentityToken(address newToken)
         external
         onlyRole(MODIFIER_ROLE)
     {
-        identityToken = IERC20(newToken);
+        _identityToken = IERC20(newToken);
         emit IdentityTokenUpdated(newToken);
     }
 
