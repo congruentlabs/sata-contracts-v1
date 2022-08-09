@@ -6,9 +6,9 @@ import "./openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./openzeppelin/contracts/access/AccessControl.sol";
 
 /*
-This is the lite version of the Signata Identity contract. There is no delegate or security key, only the caller or a specified delegate address can make changes.
+This is the nano version of the Signata Identity contract. There is no delegate or security key, only the caller or a specified delegate address can make changes.
 */
-contract SignataIdentityLite is AccessControl {
+contract SignataIdentityNano is AccessControl {
     IERC20 public _identityToken;
     mapping(address => uint256) public _identityRolloverCount;
     mapping(address => address) public _identityDelegate;
@@ -46,7 +46,7 @@ contract SignataIdentityLite is AccessControl {
     modifier isDelegateFor(address subject) {
         require(
             _identityDelegate[subject] == msg.sender,
-            "SignataIdentityLite: Not the delegate address"
+            "SignataIdentityNano: Not the delegate address"
         );
         _;
     }
@@ -54,7 +54,7 @@ contract SignataIdentityLite is AccessControl {
     modifier notLocked(address subject) {
         require(
             !_identityLocked[subject],
-            "SignataIdentityLite: The identity must not be locked."
+            "SignataIdentityNano: The identity must not be locked."
         );
         _;
     }
@@ -62,7 +62,7 @@ contract SignataIdentityLite is AccessControl {
     modifier isLocked(address subject) {
         require(
             _identityLocked[subject],
-            "SignataIdentityLite: The identity must be locked."
+            "SignataIdentityNano: The identity must be locked."
         );
         _;
     }
@@ -70,7 +70,7 @@ contract SignataIdentityLite is AccessControl {
     modifier isIdentity(address subject) {
         require(
             _identityExists[subject],
-            "SignataIdentityLite: The identity must exist."
+            "SignataIdentityNano: The identity must exist."
         );
         _;
     }
@@ -78,7 +78,7 @@ contract SignataIdentityLite is AccessControl {
     modifier notIdentity(address subject) {
         require(
             !_identityExists[subject],
-            "SignataIdentityLite: The identity must not exist."
+            "SignataIdentityNano: The identity must not exist."
         );
         _;
     }
@@ -92,7 +92,7 @@ contract SignataIdentityLite is AccessControl {
     {
         require(
             !_identityExists[msg.sender],
-            "SignataIdentityLite: The identity must not already exist."
+            "SignataIdentityNano: The identity must not already exist."
         );
 
         bool takeFee = true;
@@ -103,7 +103,7 @@ contract SignataIdentityLite is AccessControl {
 
         if (takeFee) {
             (bool success, ) = payable(address(this)).call{ value: nonHolderFee }(""); 
-            require(success, "SignataIdentityLite: Payment not received.");
+            require(success, "SignataIdentityNano: Payment not received.");
         }
         
         _identityExists[msg.sender] = true;
@@ -130,7 +130,7 @@ contract SignataIdentityLite is AccessControl {
     {
         require(
             hasRole(DELEGATE_ROLE, delegate),
-            "SignataIdentityLite: Delegate address not assigned DELEGATE_ROLE."
+            "SignataIdentityNano: Delegate address not assigned DELEGATE_ROLE."
         );
         _identityDelegate[msg.sender] = delegate;
         emit DelegateSet(delegate);
@@ -180,7 +180,7 @@ contract SignataIdentityLite is AccessControl {
         onlyRole(MODIFIER_ROLE)
     {
         (bool success, ) = payable(to).call{ value: address(this).balance }("");
-        require(success, "SignataIdentityLite: Withdraw failed.");
+        require(success, "SignataIdentityNano: Withdraw failed.");
         emit NativeWithdrawn(to);
     }
     
