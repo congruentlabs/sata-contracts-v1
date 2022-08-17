@@ -88,11 +88,6 @@ contract SignataIdentity {
         address identity = ecrecover(digest, identityV, identityR, identityS);
         
         require(
-            msg.sender == identity,
-            "SignataIdentity: The identity to be created must match the address of the sender."
-        );
-        
-        require(
             identity != delegateKey && identity != securityKey && delegateKey != securityKey,
             "SignataIdentity: Keys must be unique."
         );
@@ -179,10 +174,7 @@ contract SignataIdentity {
             "SignataIdentity: The identity has already been locked."
         );
         
-        require(
-            msg.sender == _identityToDelegateKey[identity] || msg.sender == _identityToSecurityKey[identity],
-            "SignataIdentity: The sender is unauthorised to lock identity."
-        );
+        // TODO: validate a signature from the delegate OR the security key, not both
         
         _identityLocked[identity] = true;
         _identityLockCount[identity] += 1;
@@ -311,15 +303,12 @@ contract SignataIdentity {
         );
         
         require(
-            msg.sender == _identityToDelegateKey[identity] || msg.sender == _identityToSecurityKey[identity],
-            "SignataIdentity: The sender is unauthorised to rollover the identity."
-        );
-        
-        require(
             _identityRolloverCount[identity] != MAX_UINT256,
             "SignataIdentity: The identity has already reached the maximum number of rollovers allowed."
         );
         
+        // TODO: validate a signature from the delegate OR the security key, not both
+
         bytes32 digest = keccak256(
             abi.encodePacked(
                 "\x19\x01",
@@ -389,11 +378,8 @@ contract SignataIdentity {
             _identityLockCount[identity] != MAX_UINT256,
             "SignataIdentity: The identity is permanently locked."
         );
-        
-        require(
-            msg.sender == _identityToDelegateKey[identity] || msg.sender == _identityToSecurityKey[identity],
-            "SignataIdentity: The sender is unauthorised to unlock the identity."
-        );
+
+        // TODO: validate a signature from the delegate OR the security key, not both
         
         bytes32 digest = keccak256(
             abi.encodePacked(
