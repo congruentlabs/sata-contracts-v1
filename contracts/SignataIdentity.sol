@@ -3,42 +3,42 @@
 pragma solidity ^0.8.11;
 
 contract SignataIdentity {
-    uint256 private constant MAX_UINT256 = type(uint256).max;
+    uint256 public constant MAX_UINT256 = type(uint256).max;
     
     // keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract,bytes32 salt)")
-    bytes32 private constant EIP712DOMAINTYPE_DIGEST = 0xd87cd6ef79d4e2b95e15ce8abf732db51ec771f1ca2edccf22a46c729ac56472;
+    bytes32 public constant EIP712DOMAINTYPE_DIGEST = 0xd87cd6ef79d4e2b95e15ce8abf732db51ec771f1ca2edccf22a46c729ac56472;
     
     // keccak256("Signata")
-    bytes32 private constant NAME_DIGEST = 0xfc8e166e81add347414f67a8064c94523802ae76625708af4cddc107b656844f;
+    bytes32 public constant NAME_DIGEST = 0xfc8e166e81add347414f67a8064c94523802ae76625708af4cddc107b656844f;
     
     // keccak256("1")
-    bytes32 private constant VERSION_DIGEST = 0xc89efdaa54c0f20c7adf612882df0950f5a951637e0307cdcb4c672f298b8bc6;
+    bytes32 public constant VERSION_DIGEST = 0xc89efdaa54c0f20c7adf612882df0950f5a951637e0307cdcb4c672f298b8bc6;
     
-    bytes32 private constant SALT = 0x233cdb81615d25013bb0519fbe69c16ddc77f9fa6a9395bd2aecfdfc1c0896e3;
+    bytes32 public constant SALT = 0x233cdb81615d25013bb0519fbe69c16ddc77f9fa6a9395bd2aecfdfc1c0896e3;
     
     // keccak256("SignataIdentityCreateTransaction(address delegateKey, address securityKey)")
-    bytes32 private constant TXTYPE_CREATE_DIGEST = 0x469a26f6afcc5806677c064ceb4b952f409123d7e70ab1fd0a51e86205b9937b;   
+    bytes32 public constant TXTYPE_CREATE_DIGEST = 0x469a26f6afcc5806677c064ceb4b952f409123d7e70ab1fd0a51e86205b9937b;   
     
     // keccak256("SignataIdentityRolloverTransaction(address identity, address newDelegateKey, address newSecurityKey, uint256 rolloverCount)")
-    bytes32 private constant TXTYPE_ROLLOVER_DIGEST = 0x3925a5eeb744076e798ef9df4a1d3e1d70bcca2f478f6df9e6f0496d7de53e1e;
+    bytes32 public constant TXTYPE_ROLLOVER_DIGEST = 0x3925a5eeb744076e798ef9df4a1d3e1d70bcca2f478f6df9e6f0496d7de53e1e;
     
     // keccak256("SignataIdentityUnlockTransaction(uint256 lockCount)")
-    bytes32 private constant TXTYPE_UNLOCK_DIGEST = 0xd814812ff462bae7ba452aadd08061fe1b4bda9916c0c4a84c25a78985670a7b;
+    bytes32 public constant TXTYPE_UNLOCK_DIGEST = 0xd814812ff462bae7ba452aadd08061fe1b4bda9916c0c4a84c25a78985670a7b;
     
     // keccak256("SignataIdentityDestroyTransaction()");
-    bytes32 private constant TXTYPE_DESTROY_DIGEST = 0x21459c8977584463672e32d031e5caf426140890a0f0d2172da41491b70ef9f5;
+    bytes32 public constant TXTYPE_DESTROY_DIGEST = 0x21459c8977584463672e32d031e5caf426140890a0f0d2172da41491b70ef9f5;
     
-    bytes32 private immutable _domainSeperator;
+    bytes32 public immutable _domainSeperator;
     
     // storage
-    mapping(address => address) private _delegateKeyToIdentity;
-    mapping(address => uint256) private _identityLockCount;
-    mapping(address => uint256) private _identityRolloverCount;
-    mapping(address => address) private _identityToSecurityKey;
-    mapping(address => address) private _identityToDelegateKey;
-    mapping(address => bool) private _identityDestroyed;
-    mapping(address => bool) private _identityExists;
-    mapping(address => bool) private _identityLocked;
+    mapping(address => address) public _delegateKeyToIdentity;
+    mapping(address => uint256) public _identityLockCount;
+    mapping(address => uint256) public _identityRolloverCount;
+    mapping(address => address) public _identityToSecurityKey;
+    mapping(address => address) public _identityToDelegateKey;
+    mapping(address => bool) public _identityDestroyed;
+    mapping(address => bool) public _identityExists;
+    mapping(address => bool) public _identityLocked;
     
     constructor(uint256 chainId) {
         _domainSeperator = keccak256(
