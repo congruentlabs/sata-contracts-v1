@@ -126,6 +126,11 @@ contract SignataIdentity {
         external
     {
         require(
+            _nextNonce[identity] != nextNonce,
+            "SignataIdentity: Invalid Nonce"
+        );
+
+        require(
             _identityExists[identity],
             "SignataIdentity: The identity must exist."
         );
@@ -181,6 +186,11 @@ contract SignataIdentity {
         external
     {
         require(
+            _nextNonce[identity] != nextNonce,
+            "SignataIdentity: Invalid Nonce"
+        );
+
+        require(
             _identityExists[identity],
             "SignataIdentity: The identity must exist."
         );
@@ -232,6 +242,11 @@ contract SignataIdentity {
     ) 
         external 
     {
+        require(
+            _nextNonce[identity] != nextNonce,
+            "SignataIdentity: Invalid Nonce"
+        );
+
         require(
             _identityExists[identity],
             "SignataIdentity: The identity must exist."
@@ -293,6 +308,11 @@ contract SignataIdentity {
     ) 
         external 
     {
+        require(
+            _nextNonce[identity] != nextNonce,
+            "SignataIdentity: Invalid Nonce"
+        );
+
         require(
             _identityExists[identity],
             "SignataIdentity: The identity must exist."
