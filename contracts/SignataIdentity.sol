@@ -16,20 +16,20 @@ contract SignataIdentity {
     
     bytes32 public constant SALT = 0x233cdb81615d25013bb0519fbe69c16ddc77f9fa6a9395bd2aecfdfc1c0896e3;
     
-    // keccak256("SignataIdentityCreateTransaction(address delegateKey, address securityKey)")
-    bytes32 public constant TXTYPE_CREATE_DIGEST = 0x469a26f6afcc5806677c064ceb4b952f409123d7e70ab1fd0a51e86205b9937b;   
+    // keccak256("create(uint8 identityV, bytes32 identityR, bytes32 identityS, address delegateAddress, address securityKey)")
+    bytes32 public constant TXTYPE_CREATE_DIGEST = 0x087280f638c5afab2bc9df90375624dfabc18c6dcec33665afdc2db6ad4048b1;
     
-    // keccak256("SignataIdentityRolloverTransaction(address identity, address newDelegateKey, address newSecurityKey, uint256 rolloverCount)")
-    bytes32 public constant TXTYPE_ROLLOVER_DIGEST = 0x3925a5eeb744076e798ef9df4a1d3e1d70bcca2f478f6df9e6f0496d7de53e1e;
+    // keccak256("destroy(address identity, uint8 delegateV, bytes32 delegateR, bytes32 delegateS, uint8 securityV, bytes32 securityR, bytes32 securityS)");
+    bytes32 public constant TXTYPE_DESTROY_DIGEST = 0x9b364f015edab2a56fcadebbd609a6626a0612d05dd5d0b2203e1b1317d70ef7;
     
-    // keccak256("SignataIdentityUnlockTransaction(uint256 lockCount)")
-    bytes32 public constant TXTYPE_LOCK_DIGEST = 0xd814812ff462bae7ba452aadd08061fe1b4bda9916c0c4a84c25a78985670a7b;
-    
-    // keccak256("SignataIdentityUnlockTransaction(uint256 lockCount)")
-    bytes32 public constant TXTYPE_UNLOCK_DIGEST = 0xd814812ff462bae7ba452aadd08061fe1b4bda9916c0c4a84c25a78985670a7b;
-    
-    // keccak256("SignataIdentityDestroyTransaction()");
-    bytes32 public constant TXTYPE_DESTROY_DIGEST = 0x21459c8977584463672e32d031e5caf426140890a0f0d2172da41491b70ef9f5;
+    // keccak256("lock(address identity, uint8 sigV, bytes32 sigR, bytes32 sigS)")
+    bytes32 public constant TXTYPE_LOCK_DIGEST = 0x703ed461c8d1c12e6e8b4708e8034e12d743b6221f0dbc5d301224713022c204;
+
+    // keccak256("unlock(address identity, uint8 securityV, bytes32 securityR, bytes32 securityS)")
+    bytes32 public constant TXTYPE_UNLOCK_DIGEST = 0x8364584c57b345e5810179c75cd470a8b1bd71cc8ee2c05074a1ffe55b48b865;
+
+    // keccak256("rollover(address identity, uint8 delegateV, bytes32 delegateR, bytes32 delegateS, uint8 securityV, bytes32 securityR, bytes32 securityS, address newDelegateAddress, address newSecurityAddress)")
+    bytes32 public constant TXTYPE_ROLLOVER_DIGEST = 0x7c62ea77dc835faa5b9bff6fd0f00c7b793acdd94960f48e7c9f47e28462085f;
     
     bytes32 public immutable _domainSeperator;
     
@@ -42,7 +42,6 @@ contract SignataIdentity {
     mapping(address => bool) public _identityDestroyed;
     mapping(address => bool) public _identityExists;
     mapping(address => bool) public _identityLocked;
-    mapping(address => uint256) public _nextNonce;
     
     constructor(uint256 chainId) {
         _domainSeperator = keccak256(
@@ -68,8 +67,7 @@ contract SignataIdentity {
         bytes32 identityR, 
         bytes32 identityS, 
         address delegateAddress, 
-        address securityKey,
-        uint256 nextNonce
+        address securityKey
     )
         external
     {
@@ -108,11 +106,10 @@ contract SignataIdentity {
         _identityToDelegateKey[identity] = delegateAddress;
         _identityExists[identity] = true;
         _identityToSecurityKey[identity] = securityKey;
-        _nextNonce[identity] = nextNonce;
         
         emit Create(identity, delegateAddress, securityKey);
     }
-    
+
     function destroy(
         address identity,
         uint8 delegateV,
@@ -120,16 +117,10 @@ contract SignataIdentity {
         bytes32 delegateS,
         uint8 securityV,
         bytes32 securityR, 
-        bytes32 securityS,
-        uint256 nextNonce
+        bytes32 securityS
     )
         external
     {
-        require(
-            _nextNonce[identity] != nextNonce,
-            "SignataIdentity: Invalid Nonce"
-        );
-
         require(
             _identityExists[identity],
             "SignataIdentity: The identity must exist."
@@ -144,8 +135,11 @@ contract SignataIdentity {
             abi.encodePacked(
                 "\x19\x01",
                 _domainSeperator,
-                _nextNonce[identity],
-                keccak256(abi.encode(TXTYPE_DESTROY_DIGEST))
+                keccak256(
+                    abi.encode(
+                        TXTYPE_DESTROY_DIGEST
+                    )
+                )
             )
         );
         
@@ -171,25 +165,18 @@ contract SignataIdentity {
         delete _identityToSecurityKey[identity];
         delete _identityToDelegateKey[identity];
         delete _identityLocked[identity];
-        _nextNonce[identity] = nextNonce;
         
         emit Destroy(identity);
     }
-    
+
     function lock(
         address identity,
-        uint8 delegateV,
-        bytes32 delegateR,
-        bytes32 delegateS,
-        uint256 nextNonce
+        uint8 sigV,
+        bytes32 sigR,
+        bytes32 sigS
     )
         external
     {
-        require(
-            _nextNonce[identity] != nextNonce,
-            "SignataIdentity: Invalid Nonce"
-        );
-
         require(
             _identityExists[identity],
             "SignataIdentity: The identity must exist."
@@ -212,41 +199,33 @@ contract SignataIdentity {
                 keccak256(
                     abi.encode(
                         TXTYPE_LOCK_DIGEST,
-                        _nextNonce[identity],
                         _identityLockCount[identity]
                     )
                 )
             )
         );
         
-        address delegateAddress = ecrecover(digest, delegateV, delegateR, delegateS);
+        address recoveredAddress = ecrecover(digest, sigV, sigR, sigS);
         
         require(
-            _identityToDelegateKey[identity] == delegateAddress,
-            "SignataIdentity: Invalid delegate key signature provided."
-        ); 
+            _identityToDelegateKey[identity] == recoveredAddress || _identityToSecurityKey[identity] == recoveredAddress,
+            "SignataIdentity: Invalid key signature provided."
+        );
 
         _identityLocked[identity] = true;
         _identityLockCount[identity] += 1;
-        _nextNonce[identity] = nextNonce;
         
         emit Lock(identity);
     }
-    
+
     function unlock(
         address identity,
         uint8 securityV,
         bytes32 securityR,
-        bytes32 securityS,
-        uint256 nextNonce
+        bytes32 securityS
     ) 
         external 
     {
-        require(
-            _nextNonce[identity] != nextNonce,
-            "SignataIdentity: Invalid Nonce"
-        );
-
         require(
             _identityExists[identity],
             "SignataIdentity: The identity must exist."
@@ -274,7 +253,6 @@ contract SignataIdentity {
                 keccak256(
                     abi.encode(
                         TXTYPE_UNLOCK_DIGEST,
-                        _nextNonce[identity],
                         _identityLockCount[identity]
                     )
                 )
@@ -289,11 +267,10 @@ contract SignataIdentity {
         );
         
         _identityLocked[identity] = false;
-        _nextNonce[identity] = nextNonce;
         
         emit Unlock(identity);
     }
-
+    
     function rollover(
         address identity,
         uint8 delegateV,
@@ -302,17 +279,11 @@ contract SignataIdentity {
         uint8 securityV,
         bytes32 securityR,
         bytes32 securityS,
-        address newDelegateKey,
-        address newSecurityKey,
-        uint256 nextNonce
+        address newDelegateAddress,
+        address newSecurityAddress
     ) 
         external 
     {
-        require(
-            _nextNonce[identity] != nextNonce,
-            "SignataIdentity: Invalid Nonce"
-        );
-
         require(
             _identityExists[identity],
             "SignataIdentity: The identity must exist."
@@ -324,12 +295,12 @@ contract SignataIdentity {
         );
         
         require(
-            identity != newDelegateKey && identity != newSecurityKey && newDelegateKey != newSecurityKey,
+            identity != newDelegateAddress && identity != newSecurityAddress && newDelegateAddress != newSecurityAddress,
             "SignataIdentity: The keys must be unique."
         );
         
         require(
-            _delegateKeyToIdentity[newDelegateKey] == address(0),
+            _delegateKeyToIdentity[newDelegateAddress] == address(0),
             "SignataIdentity: The new delegate key must not already be in use."
         );
         
@@ -345,9 +316,8 @@ contract SignataIdentity {
                 keccak256(
                     abi.encode(
                         TXTYPE_ROLLOVER_DIGEST,
-                        newDelegateKey,
-                        newSecurityKey,
-                        _nextNonce[identity],
+                        newDelegateAddress,
+                        newSecurityAddress,
                         _identityRolloverCount[identity]
                     )
                 )
@@ -370,13 +340,12 @@ contract SignataIdentity {
         
         delete _delegateKeyToIdentity[delegateAddress];
         
-        _delegateKeyToIdentity[newDelegateKey] = identity;
-        _identityToDelegateKey[identity] = newDelegateKey;
-        _identityToSecurityKey[identity] = newSecurityKey;
+        _delegateKeyToIdentity[newDelegateAddress] = identity;
+        _identityToDelegateKey[identity] = newDelegateAddress;
+        _identityToSecurityKey[identity] = newSecurityAddress;
         _identityRolloverCount[identity] += 1;
-        _nextNonce[identity] = nextNonce;
         
-        emit Rollover(identity, newDelegateKey, newSecurityKey);
+        emit Rollover(identity, newDelegateAddress, newSecurityAddress);
     }
     
     function getDelegate(address identity)
