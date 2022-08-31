@@ -31,7 +31,7 @@ contract SignataIdentity {
     // keccak256("rollover(address identity, uint8 delegateV, bytes32 delegateR, bytes32 delegateS, uint8 securityV, bytes32 securityR, bytes32 securityS, address newDelegateAddress, address newSecurityAddress)")
     bytes32 public constant TXTYPE_ROLLOVER_DIGEST = 0x7c62ea77dc835faa5b9bff6fd0f00c7b793acdd94960f48e7c9f47e28462085f;
     
-    bytes32 public immutable _domainSeperator;
+    bytes32 public immutable _domainSeparator;
     
     // storage
     mapping(address => address) public _delegateKeyToIdentity;
@@ -44,7 +44,7 @@ contract SignataIdentity {
     mapping(address => bool) public _identityLocked;
     
     constructor(uint256 chainId) {
-        _domainSeperator = keccak256(
+        _domainSeparator = keccak256(
             abi.encode(
                 EIP712DOMAINTYPE_DIGEST,
                 NAME_DIGEST,
@@ -65,9 +65,10 @@ contract SignataIdentity {
     function create(
         uint8 identityV, 
         bytes32 identityR, 
-        bytes32 identityS, 
+        bytes32 identityS,
+        address identityAddress,
         address delegateAddress, 
-        address securityKey
+        address securityAddress
     )
         external
     {
@@ -79,21 +80,23 @@ contract SignataIdentity {
         bytes32 digest = keccak256(
             abi.encodePacked(
                 "\x19\x01",
-                _domainSeperator,
+                _domainSeparator,
                 keccak256(
                     abi.encode(
                         TXTYPE_CREATE_DIGEST,
                         delegateAddress,
-                        securityKey
+                        securityAddress
                     )
                 )
             )
         );
         
         address identity = ecrecover(digest, identityV, identityR, identityS);
+
+        require(identity == identityAddress, "SignataIdentity: Invalid signature for identity");
         
         require(
-            identity != delegateAddress && identity != securityKey && delegateAddress != securityKey,
+            identity != delegateAddress && identity != securityAddress && delegateAddress != securityAddress,
             "SignataIdentity: Keys must be unique."
         );
         
@@ -105,9 +108,9 @@ contract SignataIdentity {
         _delegateKeyToIdentity[delegateAddress] = identity;
         _identityToDelegateKey[identity] = delegateAddress;
         _identityExists[identity] = true;
-        _identityToSecurityKey[identity] = securityKey;
+        _identityToSecurityKey[identity] = securityAddress;
         
-        emit Create(identity, delegateAddress, securityKey);
+        emit Create(identity, delegateAddress, securityAddress);
     }
 
     function destroy(
@@ -134,7 +137,7 @@ contract SignataIdentity {
         bytes32 digest = keccak256(
             abi.encodePacked(
                 "\x19\x01",
-                _domainSeperator,
+                _domainSeparator,
                 keccak256(
                     abi.encode(
                         TXTYPE_DESTROY_DIGEST
@@ -150,10 +153,10 @@ contract SignataIdentity {
             "SignataIdentity: Invalid delegate key signature provided."
         );
         
-        address securityKey = ecrecover(digest, securityV, securityR, securityS);
+        address securityAddress = ecrecover(digest, securityV, securityR, securityS);
         
         require(
-            _identityToSecurityKey[identity] == securityKey,
+            _identityToSecurityKey[identity] == securityAddress,
             "SignataIdentity: Invalid security key signature provided."
         );
         
@@ -195,7 +198,7 @@ contract SignataIdentity {
         bytes32 digest = keccak256(
             abi.encodePacked(
                 "\x19\x01",
-                _domainSeperator,
+                _domainSeparator,
                 keccak256(
                     abi.encode(
                         TXTYPE_LOCK_DIGEST,
@@ -249,7 +252,7 @@ contract SignataIdentity {
         bytes32 digest = keccak256(
             abi.encodePacked(
                 "\x19\x01",
-                _domainSeperator,
+                _domainSeparator,
                 keccak256(
                     abi.encode(
                         TXTYPE_UNLOCK_DIGEST,
@@ -312,7 +315,7 @@ contract SignataIdentity {
         bytes32 digest = keccak256(
             abi.encodePacked(
                 "\x19\x01",
-                _domainSeperator,
+                _domainSeparator,
                 keccak256(
                     abi.encode(
                         TXTYPE_ROLLOVER_DIGEST,
