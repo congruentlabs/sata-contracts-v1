@@ -69,7 +69,7 @@ contract ClaimRight is Ownable {
         uint8 sigV,
         bytes32 sigR,
         bytes32 sigS,
-        uint256 right
+        uint256 nonce
     )
         external
     {
@@ -80,10 +80,10 @@ contract ClaimRight is Ownable {
         }
 
         // check if the right is already claimed
-        require(!claimedRight[right], "ClaimRight: Right already claimed");
-        require(!cancelledClaim[right], "ClaimRight: Claim cancelled");
+        require(!claimedRight[nonce], "ClaimRight: Right already claimed");
+        require(!cancelledClaim[nonce], "ClaimRight: Claim cancelled");
 
-        claimedRight[right] = true;
+        claimedRight[nonce] = true;
 
         // validate the signature
         bytes32 digest = keccak256(
@@ -93,7 +93,7 @@ contract ClaimRight is Ownable {
                 keccak256(
                     abi.encode(
                         TXTYPE_CLAIM_DIGEST,
-                        right
+                        nonce
                     )
                 )
             )
@@ -105,20 +105,20 @@ contract ClaimRight is Ownable {
         // assign the right to the identity
         signataRight.mintRight(schemaId, identity, false);
 
-        emit RightClaimed(right, identity);
+        emit RightClaimed(nonce, identity);
     }
 
     function cancelClaim(
-        uint256 right
+        uint256 nonce
     )
         external onlyOwner
     {
-        require(!claimedRight[right], "ClaimRight: Right already claimed");
-        require(!cancelledClaim[right], "ClaimRight: Claim already cancelled");
+        require(!claimedRight[nonce], "ClaimRight: Right already claimed");
+        require(!cancelledClaim[nonce], "ClaimRight: Claim already cancelled");
 
-        cancelledClaim[right] = true;
+        cancelledClaim[nonce] = true;
 
-        emit ClaimCancelled(right);
+        emit ClaimCancelled(nonce);
     }
     
     function updateSigningAuthority(
@@ -150,8 +150,9 @@ contract ClaimRight is Ownable {
     function withdrawNative()
         external
         onlyOwner
+        returns (bool)
     {
-
-        payable(msg.sender).call{value: address(this).balance}("");
+        (bool success,) = payable(msg.sender).call{value: address(this).balance}("");
+        return success;
     }
 }
