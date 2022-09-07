@@ -38,7 +38,6 @@ contract ClaimRight is Ownable {
         address _signataRight,
         address _signataIdentity,
         address _signingAuthority,
-        uint256 chainId,
         string memory _name,
         string memory _schemaURI
     ) {
@@ -55,8 +54,6 @@ contract ClaimRight is Ownable {
                 EIP712DOMAINTYPE_DIGEST,
                 NAME_DIGEST,
                 VERSION_DIGEST,
-                chainId,
-                this,
                 SALT
             )
         );
