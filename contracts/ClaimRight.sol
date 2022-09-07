@@ -22,15 +22,15 @@ contract ClaimRight is Ownable {
     bytes32 public constant TXTYPE_CLAIM_DIGEST = 0x8891c73a2637b13c5e7164598239f81256ea5e7b7dcdefd496a0acd25744091c;
     bytes32 public immutable domainSeparator;
 
-    mapping(uint256 => bool) public claimedRight;
-    mapping(uint256 => bool) public cancelledClaim;
+    mapping(address => bool) public claimedRight;
+    mapping(address => bool) public cancelledClaim;
 
     event RightAssigned();
     event RightClaimed();
     event EmergencyRightClaimed();
     event ModifiedFee(uint256 oldAmount, uint256 newAmount);
     event FeesTaken(uint256 feesAmount);
-    event ClaimCancelled(uint256 right);
+    event ClaimCancelled(address identity);
     event RightClaimed(uint256 right, address identity);
 
     constructor(
@@ -80,10 +80,10 @@ contract ClaimRight is Ownable {
         }
 
         // check if the right is already claimed
-        require(!claimedRight[nonce], "ClaimRight: Right already claimed");
-        require(!cancelledClaim[nonce], "ClaimRight: Claim cancelled");
+        require(!claimedRight[identity], "ClaimRight: Right already claimed");
+        require(!cancelledClaim[identity], "ClaimRight: Claim cancelled");
 
-        claimedRight[nonce] = true;
+        claimedRight[identity] = true;
 
         // validate the signature
         bytes32 digest = keccak256(
@@ -93,7 +93,7 @@ contract ClaimRight is Ownable {
                 keccak256(
                     abi.encode(
                         TXTYPE_CLAIM_DIGEST,
-                        nonce
+                        identity
                     )
                 )
             )
@@ -109,16 +109,16 @@ contract ClaimRight is Ownable {
     }
 
     function cancelClaim(
-        uint256 nonce
+        address identity
     )
         external onlyOwner
     {
-        require(!claimedRight[nonce], "ClaimRight: Right already claimed");
-        require(!cancelledClaim[nonce], "ClaimRight: Claim already cancelled");
+        require(!claimedRight[identity], "ClaimRight: Right already claimed");
+        require(!cancelledClaim[identity], "ClaimRight: Claim already cancelled");
 
-        cancelledClaim[nonce] = true;
+        cancelledClaim[identity] = true;
 
-        emit ClaimCancelled(nonce);
+        emit ClaimCancelled(identity);
     }
     
     function updateSigningAuthority(
