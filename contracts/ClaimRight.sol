@@ -32,6 +32,7 @@ contract ClaimRight is Ownable {
     event FeesTaken(uint256 feesAmount);
     event ClaimCancelled(address identity);
     event RightClaimed(uint256 right, address identity);
+    event ClaimReset(address identity);
 
     constructor(
         address _signataToken,
@@ -119,6 +120,17 @@ contract ClaimRight is Ownable {
         cancelledClaim[identity] = true;
 
         emit ClaimCancelled(identity);
+    }
+
+    function resetClaim(
+        address identity
+    )
+        external onlyOwner
+    {
+        claimedRight[identity] = false;
+        cancelledClaim[identity] = false;
+
+        emit ClaimReset(identity);
     }
     
     function updateSigningAuthority(
