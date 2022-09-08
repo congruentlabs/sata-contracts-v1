@@ -24,6 +24,8 @@ contract ClaimRight is Ownable {
 
     mapping(address => bool) public claimedRight;
     mapping(address => bool) public cancelledClaim;
+    mapping(address => uint) public expiresAt;
+    mapping(address => bytes32) public claimSalts;
 
     event RightAssigned();
     event RightClaimed();
@@ -31,7 +33,7 @@ contract ClaimRight is Ownable {
     event ModifiedFee(uint256 oldAmount, uint256 newAmount);
     event FeesTaken(uint256 feesAmount);
     event ClaimCancelled(address identity);
-    event RightClaimed(uint256 right, address identity);
+    event RightClaimed(address identity);
     event ClaimReset(address identity);
 
     constructor(
@@ -67,7 +69,7 @@ contract ClaimRight is Ownable {
         uint8 sigV,
         bytes32 sigR,
         bytes32 sigS,
-        uint256 nonce
+        bytes32 salt
     )
         external
     {
@@ -80,8 +82,12 @@ contract ClaimRight is Ownable {
         // check if the right is already claimed
         require(!claimedRight[identity], "ClaimRight: Right already claimed");
         require(!cancelledClaim[identity], "ClaimRight: Claim cancelled");
+        require(claimSalts[identity] != salt, "ClaimRight: Salt already used");
 
-        claimedRight[identity] = true;
+        require(expiresAt[identity] == 0 || block.timestamp > expiresAt[identity], "ClaimRight: Claim expired");
+
+        expiresAt[identity] = 52 weeks;
+        claimSalts[identity] = salt;
 
         // validate the signature
         bytes32 digest = keccak256(
@@ -91,7 +97,8 @@ contract ClaimRight is Ownable {
                 keccak256(
                     abi.encode(
                         TXTYPE_CLAIM_DIGEST,
-                        identity
+                        identity,
+                        salt
                     )
                 )
             )
@@ -103,7 +110,7 @@ contract ClaimRight is Ownable {
         // assign the right to the identity
         signataRight.mintRight(schemaId, identity, false);
 
-        emit RightClaimed(nonce, identity);
+        emit RightClaimed(identity);
     }
 
     function cancelClaim(
