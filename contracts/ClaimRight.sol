@@ -6,8 +6,9 @@ import "./SignataRight.sol";
 import "./openzeppelin/contracts/access/Ownable.sol";
 import "./openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "./tokens/IERC721Receiver.sol";
 
-contract ClaimRight is Ownable {
+contract ClaimRight is Ownable, IERC721Receiver {
     string public name;
     IERC20 private signataToken;
     SignataRight private signataRight;
@@ -21,11 +22,12 @@ contract ClaimRight is Ownable {
     bytes32 public constant EIP712DOMAINTYPE_DIGEST = 0xd87cd6ef79d4e2b95e15ce8abf732db51ec771f1ca2edccf22a46c729ac56472;
     bytes32 public constant TXTYPE_CLAIM_DIGEST = 0x8891c73a2637b13c5e7164598239f81256ea5e7b7dcdefd496a0acd25744091c;
     bytes32 public immutable domainSeparator;
+    bytes4 private constant _ERC721_RECEIVED = 0x150b7a02;
 
     mapping(address => bool) public claimedRight;
     mapping(address => bool) public cancelledClaim;
     mapping(address => uint) public expiresAt;
-    mapping(address => bytes32) public claimSalts;
+    mapping(address => bytes32) public claimSalt;
 
     event RightAssigned();
     event RightClaimed();
@@ -41,16 +43,13 @@ contract ClaimRight is Ownable {
         address _signataRight,
         address _signataIdentity,
         address _signingAuthority,
-        string memory _name,
-        string memory _schemaURI
+        string memory _name
     ) {
         signataToken = IERC20(_signataToken);
         signataRight = SignataRight(_signataRight);
         signataIdentity = SignataIdentity(_signataIdentity);
         signingAuthority = _signingAuthority;
         name = _name;
-
-        schemaId = signataRight.mintSchema(address(this), true, true, _schemaURI);
 
          domainSeparator = keccak256(
             abi.encode(
@@ -63,6 +62,25 @@ contract ClaimRight is Ownable {
     }
 
     receive() external payable {}
+
+    function onERC721Received(
+        address operator,
+        address from,
+        uint256 tokenId,
+        bytes calldata data
+    )
+        external
+        pure
+        returns (bytes4)
+    {
+        return _ERC721_RECEIVED;
+    }
+
+    function mintSchema(
+        string memory _schemaURI
+    ) external onlyOwner {
+        schemaId = signataRight.mintSchema(address(this), true, true, _schemaURI);
+    }
 
     function claimRight(
         address identity,
@@ -82,12 +100,12 @@ contract ClaimRight is Ownable {
         // check if the right is already claimed
         require(!claimedRight[identity], "ClaimRight: Right already claimed");
         require(!cancelledClaim[identity], "ClaimRight: Claim cancelled");
-        require(claimSalts[identity] != salt, "ClaimRight: Salt already used");
+        require(claimSalt[identity] != salt, "ClaimRight: Salt already used");
 
         require(expiresAt[identity] == 0 || block.timestamp > expiresAt[identity], "ClaimRight: Claim expired");
 
-        expiresAt[identity] = 52 weeks;
-        claimSalts[identity] = salt;
+        expiresAt[identity] = 1 weeks;
+        claimSalt[identity] = salt;
 
         // validate the signature
         bytes32 digest = keccak256(
@@ -118,8 +136,8 @@ contract ClaimRight is Ownable {
     )
         external onlyOwner
     {
-        require(!claimedRight[identity], "ClaimRight: Right already claimed");
-        require(!cancelledClaim[identity], "ClaimRight: Claim already cancelled");
+        require(!claimedRight[identity], "CancelClaim: Right already claimed");
+        require(!cancelledClaim[identity], "CancelClaim: Claim already cancelled");
 
         cancelledClaim[identity] = true;
 
