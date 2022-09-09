@@ -30,7 +30,6 @@ contract ClaimRight is Ownable, IERC721Receiver {
     mapping(address => bytes32) public claimSalt;
 
     event RightAssigned();
-    event RightClaimed();
     event EmergencyRightClaimed();
     event ModifiedFee(uint256 oldAmount, uint256 newAmount);
     event FeesTaken(uint256 feesAmount);
@@ -84,6 +83,7 @@ contract ClaimRight is Ownable, IERC721Receiver {
 
     function claimRight(
         address identity,
+        address delegate,
         uint8 sigV,
         bytes32 sigR,
         bytes32 sigS,
@@ -126,7 +126,7 @@ contract ClaimRight is Ownable, IERC721Receiver {
         require(signerAddress == signingAuthority, "ClaimRight: Invalid signature");
 
         // assign the right to the identity
-        signataRight.mintRight(schemaId, identity, false);
+        signataRight.mintRight(schemaId, delegate, false);
 
         emit RightClaimed(identity);
     }
