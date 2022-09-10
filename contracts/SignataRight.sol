@@ -211,11 +211,6 @@ contract SignataRight is IERC721Schema {
             recipient = to;
         } else {
             recipient = _signataIdentity.getIdentity(to);
-            
-            require(
-                !_signataIdentity.isLocked(minter),
-                "SignataRight: The sender's account is locked."
-            );
         }
         
         _rightsTotal += 1;
