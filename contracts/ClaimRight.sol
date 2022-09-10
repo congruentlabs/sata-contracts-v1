@@ -14,7 +14,7 @@ contract ClaimRight is Ownable, IERC721Receiver {
     SignataRight private signataRight;
     SignataIdentity private signataIdentity;
     address private signingAuthority;
-    uint256 public feeAmount = 10 * 1e18; // 10 SATA to start with
+    uint256 public feeAmount = 100 * 1e18; // 100 SATA to start with
     uint256 public schemaId;
     bytes32 public constant VERSION_DIGEST = 0xc89efdaa54c0f20c7adf612882df0950f5a951637e0307cdcb4c672f298b8bc6;
     bytes32 public constant SALT = 0x03ea6995167b253ad0cf79271b4ddbacfb51c7a4fb2872207de8a19eb0cb724b;
@@ -24,10 +24,8 @@ contract ClaimRight is Ownable, IERC721Receiver {
     bytes32 public immutable domainSeparator;
     bytes4 private constant _ERC721_RECEIVED = 0x150b7a02;
 
-    mapping(address => bool) public claimedRight;
+    mapping(address => bytes32) public claimedRight;
     mapping(address => bool) public cancelledClaim;
-    mapping(address => uint) public expiresAt;
-    mapping(address => bytes32) public claimSalt;
 
     event EmergencyRightClaimed();
     event ModifiedFee(uint256 oldAmount, uint256 newAmount);
@@ -96,14 +94,10 @@ contract ClaimRight is Ownable, IERC721Receiver {
         }
 
         // check if the right is already claimed
-        require(!claimedRight[delegate], "ClaimRight: Right already claimed");
         require(!cancelledClaim[delegate], "ClaimRight: Claim cancelled");
-        require(claimSalt[delegate] != salt, "ClaimRight: Salt already used");
+        require(claimedRight[delegate] != salt, "ClaimRight: Already claimed");
 
-        require(expiresAt[delegate] == 0 || block.timestamp < expiresAt[delegate], "ClaimRight: Claim expired");
-
-        expiresAt[delegate] = 1 weeks;
-        claimSalt[delegate] = salt;
+        claimedRight[delegate] = salt;
 
         // validate the signature
         bytes32 digest = keccak256(
@@ -134,7 +128,6 @@ contract ClaimRight is Ownable, IERC721Receiver {
     )
         external onlyOwner
     {
-        require(!claimedRight[delegate], "CancelClaim: Right already claimed");
         require(!cancelledClaim[delegate], "CancelClaim: Claim already cancelled");
 
         cancelledClaim[delegate] = true;
@@ -147,7 +140,7 @@ contract ClaimRight is Ownable, IERC721Receiver {
     )
         external onlyOwner
     {
-        claimedRight[delegate] = false;
+        claimedRight[delegate] = 0;
         cancelledClaim[delegate] = false;
 
         emit ClaimReset(delegate);
