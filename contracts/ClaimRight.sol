@@ -77,7 +77,7 @@ contract ClaimRight is Ownable, IERC721Receiver {
     function mintSchema(
         string memory _schemaURI
     ) external onlyOwner {
-        schemaId = signataRight.mintSchema(address(this), true, true, _schemaURI);
+        schemaId = signataRight.mintSchema(address(this), false, true, _schemaURI);
     }
 
     function claimRight(
@@ -124,7 +124,7 @@ contract ClaimRight is Ownable, IERC721Receiver {
         require(signerAddress == signingAuthority, "ClaimRight: Invalid signature");
 
         // assign the right to the identity
-        signataRight.mintRight(schemaId, delegate, true);
+        signataRight.mintRight(schemaId, delegate, false);
 
         emit RightClaimed(delegate);
     }
