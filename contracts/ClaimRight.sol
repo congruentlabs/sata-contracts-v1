@@ -29,7 +29,6 @@ contract ClaimRight is Ownable, IERC721Receiver {
     mapping(address => uint) public expiresAt;
     mapping(address => bytes32) public claimSalt;
 
-    event RightAssigned();
     event EmergencyRightClaimed();
     event ModifiedFee(uint256 oldAmount, uint256 newAmount);
     event FeesTaken(uint256 feesAmount);
@@ -82,7 +81,6 @@ contract ClaimRight is Ownable, IERC721Receiver {
     }
 
     function claimRight(
-        address identity,
         address delegate,
         uint8 sigV,
         bytes32 sigR,
@@ -98,14 +96,14 @@ contract ClaimRight is Ownable, IERC721Receiver {
         }
 
         // check if the right is already claimed
-        require(!claimedRight[identity], "ClaimRight: Right already claimed");
-        require(!cancelledClaim[identity], "ClaimRight: Claim cancelled");
-        require(claimSalt[identity] != salt, "ClaimRight: Salt already used");
+        require(!claimedRight[delegate], "ClaimRight: Right already claimed");
+        require(!cancelledClaim[delegate], "ClaimRight: Claim cancelled");
+        require(claimSalt[delegate] != salt, "ClaimRight: Salt already used");
 
-        require(expiresAt[identity] == 0 || block.timestamp > expiresAt[identity], "ClaimRight: Claim expired");
+        require(expiresAt[delegate] == 0 || block.timestamp < expiresAt[delegate], "ClaimRight: Claim expired");
 
-        expiresAt[identity] = 1 weeks;
-        claimSalt[identity] = salt;
+        expiresAt[delegate] = 1 weeks;
+        claimSalt[delegate] = salt;
 
         // validate the signature
         bytes32 digest = keccak256(
@@ -115,7 +113,7 @@ contract ClaimRight is Ownable, IERC721Receiver {
                 keccak256(
                     abi.encode(
                         TXTYPE_CLAIM_DIGEST,
-                        identity,
+                        delegate,
                         salt
                     )
                 )
@@ -126,33 +124,33 @@ contract ClaimRight is Ownable, IERC721Receiver {
         require(signerAddress == signingAuthority, "ClaimRight: Invalid signature");
 
         // assign the right to the identity
-        signataRight.mintRight(schemaId, delegate, false);
+        signataRight.mintRight(schemaId, delegate, true);
 
-        emit RightClaimed(identity);
+        emit RightClaimed(delegate);
     }
 
     function cancelClaim(
-        address identity
+        address delegate
     )
         external onlyOwner
     {
-        require(!claimedRight[identity], "CancelClaim: Right already claimed");
-        require(!cancelledClaim[identity], "CancelClaim: Claim already cancelled");
+        require(!claimedRight[delegate], "CancelClaim: Right already claimed");
+        require(!cancelledClaim[delegate], "CancelClaim: Claim already cancelled");
 
-        cancelledClaim[identity] = true;
+        cancelledClaim[delegate] = true;
 
-        emit ClaimCancelled(identity);
+        emit ClaimCancelled(delegate);
     }
 
     function resetClaim(
-        address identity
+        address delegate
     )
         external onlyOwner
     {
-        claimedRight[identity] = false;
-        cancelledClaim[identity] = false;
+        claimedRight[delegate] = false;
+        cancelledClaim[delegate] = false;
 
-        emit ClaimReset(identity);
+        emit ClaimReset(delegate);
     }
     
     function updateSigningAuthority(
