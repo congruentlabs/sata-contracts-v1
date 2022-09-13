@@ -5,7 +5,6 @@ import "./SignataIdentity.sol";
 import "./SignataRight.sol";
 import "./openzeppelin/contracts/access/Ownable.sol";
 import "./openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "./openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "./tokens/IERC721Receiver.sol";
 import "./openzeppelin/contracts/security/ReentrancyGuard.sol";
 
@@ -15,7 +14,7 @@ contract ClaimRight is Ownable, IERC721Receiver, ReentrancyGuard {
     SignataRight private signataRight;
     SignataIdentity private signataIdentity;
     address private signingAuthority;
-    uint256 public feeAmount = 100 * 1e18; // 100 SATA to start with
+    uint256 public feeAmount = 100 * 1e18; // 100 SATA
     uint256 public schemaId;
     bytes32 public constant VERSION_DIGEST = 0xc89efdaa54c0f20c7adf612882df0950f5a951637e0307cdcb4c672f298b8bc6;
     bytes32 public constant SALT = 0x03ea6995167b253ad0cf79271b4ddbacfb51c7a4fb2872207de8a19eb0cb724b;
