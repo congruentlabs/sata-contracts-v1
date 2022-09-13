@@ -7,10 +7,11 @@ import "./openzeppelin/contracts/access/Ownable.sol";
 import "./openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "./tokens/IERC721Receiver.sol";
+import "./openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-contract ClaimRight is Ownable, IERC721Receiver {
+contract ClaimRight is Ownable, IERC721Receiver, ReentrancyGuard {
     string public name;
-    IERC20 private signataToken;
+    IERC20 private paymentToken;
     SignataRight private signataRight;
     SignataIdentity private signataIdentity;
     address private signingAuthority;
@@ -23,6 +24,7 @@ contract ClaimRight is Ownable, IERC721Receiver {
     bytes32 public constant TXTYPE_CLAIM_DIGEST = 0x8891c73a2637b13c5e7164598239f81256ea5e7b7dcdefd496a0acd25744091c;
     bytes32 public immutable domainSeparator;
     bytes4 private constant _ERC721_RECEIVED = 0x150b7a02;
+    bool public collectNative = false;
 
     mapping(address => bytes32) public claimedRight;
     mapping(address => bool) public cancelledClaim;
@@ -33,6 +35,9 @@ contract ClaimRight is Ownable, IERC721Receiver {
     event ClaimCancelled(address identity);
     event RightClaimed(address identity);
     event ClaimReset(address identity);
+    event CollectNativeModified(bool newValue);
+    event TokenModified(address newAddress);
+    event PaymentTokenModified(address newToken);
 
     constructor(
         address _signataToken,
@@ -41,7 +46,7 @@ contract ClaimRight is Ownable, IERC721Receiver {
         address _signingAuthority,
         string memory _name
     ) {
-        signataToken = IERC20(_signataToken);
+        paymentToken = IERC20(_signataToken);
         signataRight = SignataRight(_signataRight);
         signataIdentity = SignataIdentity(_signataIdentity);
         signingAuthority = _signingAuthority;
@@ -86,11 +91,16 @@ contract ClaimRight is Ownable, IERC721Receiver {
         bytes32 salt
     )
         external
+        nonReentrant
     {
         // take the fee
-        if (feeAmount > 0) {
-            signataToken.transferFrom(msg.sender, address(this), feeAmount);
+        if (feeAmount > 0 && !collectNative) {
+            paymentToken.transferFrom(msg.sender, address(this), feeAmount);
             emit FeesTaken(feeAmount);
+        }
+        if (feeAmount > 0 && collectNative) {
+            (bool success, ) = payable(address(this)).call{ value: feeAmount }(""); 
+            require(success, "ClaimRight: Payment not received.");
         }
 
         // check if the right is already claimed
@@ -165,11 +175,33 @@ contract ClaimRight is Ownable, IERC721Receiver {
         emit ModifiedFee(oldAmount, newAmount);
     }
 
+    function modifyCollectNative(
+        bool _collectNative
+    )
+        external
+        onlyOwner
+    {
+        require(collectNative != _collectNative, "ModifyCollectNative: Already set to this value");
+        collectNative = _collectNative;
+        emit CollectNativeModified(_collectNative);
+    }
+
+    function modifyPaymentToken(
+        address newToken
+    )
+        external
+        onlyOwner
+    {
+        require(address(paymentToken) != newToken, "ModifyPaymentToken: Already set to this value");
+        paymentToken = IERC20(newToken);
+        emit PaymentTokenModified(newToken);
+    }
+
     function withdrawCollectedFees()
         external
         onlyOwner
     {
-        signataToken.transferFrom(address(this), msg.sender, signataToken.balanceOf(address(this)));
+        paymentToken.transferFrom(address(this), msg.sender, paymentToken.balanceOf(address(this)));
     }
 
     function withdrawNative()
