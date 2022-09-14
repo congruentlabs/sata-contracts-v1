@@ -80,7 +80,7 @@ contract VeriswapERC20 is Ownable, ReentrancyGuard {
                     msg.sender,
                     claimRight.schemaId()
                 ),
-                "executeSwap::Sender must have kyc nft"
+                "createSwap::Sender must have kyc nft"
             );
             // don't check the executor yet, just in case they go and kyc after the fact.
         }
