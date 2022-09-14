@@ -49,13 +49,13 @@ contract VeriswapERC20 is Ownable, ReentrancyGuard {
     event ClaimRightContractChanged(ClaimRight newClaimRight);
 
     constructor(
-        address _signataIdentity,
-        address _signataRight,
-        address payable _kycClaimRight
+        SignataIdentity _signataIdentity,
+        SignataRight _signataRight,
+        ClaimRight _kycClaimRight
     ) {
-        signataIdentity = SignataIdentity(_signataIdentity);
-        signataRight = SignataRight(_signataRight);
-        claimRight = ClaimRight(_kycClaimRight);
+        signataIdentity = _signataIdentity;
+        signataRight = _signataRight;
+        claimRight = _kycClaimRight;
     }
 
     function createSwap(
