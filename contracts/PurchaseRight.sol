@@ -13,16 +13,11 @@ contract ClaimRight is Ownable, IERC721Receiver, ReentrancyGuard {
     IERC20 private paymentToken;
     SignataRight private signataRight;
     SignataIdentity private signataIdentity;
-    address private signingAuthority;
     uint256 public feeAmount = 100 * 1e18; // 100 SATA
     uint256 public schemaId;
     bytes4 private constant _ERC721_RECEIVED = 0x150b7a02;
     bool public collectNative = false;
 
-    mapping(address => bytes32) public claimedRight;
-    mapping(address => bool) public cancelledClaim;
-
-    event EmergencyRightClaimed();
     event ModifiedFee(uint256 oldAmount, uint256 newAmount);
     event FeesTaken(uint256 feesAmount);
     event RightPurchased(address identity);
