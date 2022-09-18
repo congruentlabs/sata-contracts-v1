@@ -13,10 +13,11 @@ contract PurchaseRight is Ownable, IERC721Receiver, ReentrancyGuard {
     IERC20 public paymentToken;
     SignataRight public signataRight;
     SignataIdentity public signataIdentity;
-    uint256 public feeAmount = 100 * 1e18; // 100 SATA
+    uint256 public feeAmount = 100 * 1e18;
     uint256 public schemaId;
     bytes4 private constant _ERC721_RECEIVED = 0x150b7a02;
     bool public collectNative = false;
+    bool public purchasesEnabled = true;
 
     event ModifiedFee(uint256 oldAmount, uint256 newAmount);
     event FeesTaken(uint256 feesAmount);
@@ -24,12 +25,17 @@ contract PurchaseRight is Ownable, IERC721Receiver, ReentrancyGuard {
     event CollectNativeModified(bool newValue);
     event TokenModified(address newAddress);
     event PaymentTokenModified(address newToken);
+    event PurchasesEnabledModified(bool newValue);
 
     constructor(
         address _paymentToken,
+        address _signataRight,
+        address _signataIdentity,
         string memory _name
     ) {
         paymentToken = IERC20(_paymentToken);
+        signataRight = SignataRight(_signataRight);
+        signataIdentity = SignataIdentity(_signataIdentity);
         name = _name;
     }
 
@@ -60,6 +66,7 @@ contract PurchaseRight is Ownable, IERC721Receiver, ReentrancyGuard {
         external
         nonReentrant
     {
+        require(purchasesEnabled, "PurchaseRight: Purchases not enabled");
         // take the fee
         if (feeAmount > 0 && !collectNative) {
             paymentToken.transferFrom(msg.sender, address(this), feeAmount);
@@ -67,7 +74,7 @@ contract PurchaseRight is Ownable, IERC721Receiver, ReentrancyGuard {
         }
         if (feeAmount > 0 && collectNative) {
             (bool success, ) = payable(address(this)).call{ value: feeAmount }(""); 
-            require(success, "PurchaseRight: Payment not received.");
+            require(success, "PurchaseRight: Payment not received");
             emit FeesTaken(feeAmount);
         }
         // assign the right to the identity
@@ -96,6 +103,17 @@ contract PurchaseRight is Ownable, IERC721Receiver, ReentrancyGuard {
         require(collectNative != _collectNative, "ModifyCollectNative: Already set to this value");
         collectNative = _collectNative;
         emit CollectNativeModified(_collectNative);
+    }
+
+    function modifyPurchasesEnabled(
+        bool _purchasedEnabled
+    )
+        external
+        onlyOwner
+    {
+        require(purchasesEnabled != _purchasedEnabled, "ModifyPurchasesEnabled: Already set to this value");
+        purchasesEnabled = _purchasedEnabled;
+        emit PurchasesEnabledModified(_purchasedEnabled);
     }
 
     function modifyPaymentToken(
