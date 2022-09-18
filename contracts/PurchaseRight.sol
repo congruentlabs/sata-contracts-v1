@@ -8,11 +8,11 @@ import "./openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./tokens/IERC721Receiver.sol";
 import "./openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-contract ClaimRight is Ownable, IERC721Receiver, ReentrancyGuard {
+contract PurchaseRight is Ownable, IERC721Receiver, ReentrancyGuard {
     string public name;
-    IERC20 private paymentToken;
-    SignataRight private signataRight;
-    SignataIdentity private signataIdentity;
+    IERC20 public paymentToken;
+    SignataRight public signataRight;
+    SignataIdentity public signataIdentity;
     uint256 public feeAmount = 100 * 1e18; // 100 SATA
     uint256 public schemaId;
     bytes4 private constant _ERC721_RECEIVED = 0x150b7a02;
@@ -67,7 +67,7 @@ contract ClaimRight is Ownable, IERC721Receiver, ReentrancyGuard {
         }
         if (feeAmount > 0 && collectNative) {
             (bool success, ) = payable(address(this)).call{ value: feeAmount }(""); 
-            require(success, "ClaimRight: Payment not received.");
+            require(success, "PurchaseRight: Payment not received.");
             emit FeesTaken(feeAmount);
         }
         // assign the right to the identity

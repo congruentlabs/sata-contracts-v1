@@ -10,10 +10,10 @@ import "./openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 contract ClaimRight is Ownable, IERC721Receiver, ReentrancyGuard {
     string public name;
-    IERC20 private paymentToken;
-    SignataRight private signataRight;
-    SignataIdentity private signataIdentity;
-    address private signingAuthority;
+    IERC20 public paymentToken;
+    SignataRight public signataRight;
+    SignataIdentity public signataIdentity;
+    address public signingAuthority;
     uint256 public feeAmount = 100 * 1e18; // 100 SATA
     uint256 public schemaId;
     bytes32 public constant VERSION_DIGEST = 0xc89efdaa54c0f20c7adf612882df0950f5a951637e0307cdcb4c672f298b8bc6;
