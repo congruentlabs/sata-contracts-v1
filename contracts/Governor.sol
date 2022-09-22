@@ -8,15 +8,46 @@ import "./openzeppelin/contracts/governance/compatibility/GovernorCompatibilityB
 import "./openzeppelin/contracts/governance/extensions/GovernorVotes.sol";
 import "./openzeppelin/contracts/governance/extensions/GovernorVotesQuorumFraction.sol";
 import "./openzeppelin/contracts/governance/extensions/GovernorTimelockControl.sol";
+import "./SignataRight.json";
 
-contract SignataGovernor is Governor, GovernorSettings, GovernorCompatibilityBravo, GovernorVotes, GovernorVotesQuorumFraction, GovernorTimelockControl { 
-    constructor(IVotes _token, TimelockController _timelock)
+contract SignataGovernor is
+    Governor,
+    GovernorSettings,
+    GovernorCompatibilityBravo,
+    GovernorVotes,
+    GovernorVotesQuorumFraction,
+    GovernorTimelockControl
+{
+    SignataRight public signataRight;
+    uint256 public modifier1SchemaId;
+    uint256 public modifier2SchemaId;
+    uint256 public modifier1Multiplier = 200; // 2x default
+    uint256 public modifier2Multiplier = 150; // 1.5x default
+
+    bool public enableModifiers = true;
+    uint256 public modifierExpiration = now + 365 days;
+
+    constructor(
+        IVotes _token,
+        TimelockController _timelock,
+        SignataRight _signataRight,
+        uint256 _modifier1SchemaId,
+        uint256 _modifier2SchemaId
+    )
         Governor("Signata Governor")
-        GovernorSettings(6545 /* 1 day */, 45818 /* 7 days */, 1)
+        GovernorSettings(
+            6545, /* 1 day */
+            45818, /* 7 days */
+            1
+        )
         GovernorVotes(_token)
         GovernorVotesQuorumFraction(4)
         GovernorTimelockControl(_timelock)
-    {}
+    {
+        signataRight = _signataRight;
+        modifier1SchemaId = _modifier1SchemaId;
+        modifier2SchemaId = _modifier2SchemaId;
+    }
 
     // The following functions are overrides required by Solidity.
 
@@ -53,6 +84,17 @@ contract SignataGovernor is Governor, GovernorSettings, GovernorCompatibilityBra
         override(Governor, IGovernor)
         returns (uint256)
     {
+        if (enableModifiers && now < modifierExpiration) {
+            if (signataRight.holdsTokenOfSchema(account, modifier1SchemaId)) {
+                uint256 votes = super.getVotes(account, blockNumber);
+                return (votes * modifier1Multiplier) / 100;
+            } else if (
+                signataRight.holdsTokenOfSchema(account, modifier2SchemaId)
+            ) {
+                uint256 votes = super.getVotes(account, blockNumber);
+                return (votes * modifier2Multiplier) / 100;
+            }
+        }
         return super.getVotes(account, blockNumber);
     }
 
@@ -65,7 +107,12 @@ contract SignataGovernor is Governor, GovernorSettings, GovernorCompatibilityBra
         return super.state(proposalId);
     }
 
-    function propose(address[] memory targets, uint256[] memory values, bytes[] memory calldatas, string memory description)
+    function propose(
+        address[] memory targets,
+        uint256[] memory values,
+        bytes[] memory calldatas,
+        string memory description
+    )
         public
         override(Governor, GovernorCompatibilityBravo, IGovernor)
         returns (uint256)
@@ -82,18 +129,22 @@ contract SignataGovernor is Governor, GovernorSettings, GovernorCompatibilityBra
         return super.proposalThreshold();
     }
 
-    function _execute(uint256 proposalId, address[] memory targets, uint256[] memory values, bytes[] memory calldatas, bytes32 descriptionHash)
-        internal
-        override(Governor, GovernorTimelockControl)
-    {
+    function _execute(
+        uint256 proposalId,
+        address[] memory targets,
+        uint256[] memory values,
+        bytes[] memory calldatas,
+        bytes32 descriptionHash
+    ) internal override(Governor, GovernorTimelockControl) {
         super._execute(proposalId, targets, values, calldatas, descriptionHash);
     }
 
-    function _cancel(address[] memory targets, uint256[] memory values, bytes[] memory calldatas, bytes32 descriptionHash)
-        internal
-        override(Governor, GovernorTimelockControl)
-        returns (uint256)
-    {
+    function _cancel(
+        address[] memory targets,
+        uint256[] memory values,
+        bytes[] memory calldatas,
+        bytes32 descriptionHash
+    ) internal override(Governor, GovernorTimelockControl) returns (uint256) {
         return super._cancel(targets, values, calldatas, descriptionHash);
     }
 
@@ -113,5 +164,30 @@ contract SignataGovernor is Governor, GovernorSettings, GovernorCompatibilityBra
         returns (bool)
     {
         return super.supportsInterface(interfaceId);
+    }
+
+    function changeSignataRight(SignataRight _signataRight)
+        public
+        onlyGovernance
+    {
+        signataRight = _signataRight;
+    }
+
+    function reinstateExpirationBlock() {
+        modifierExpiration = now + 365 days;
+    }
+
+    function editModifiers(
+        uint256 _modifier1SchemaId,
+        uint256 _modifier2SchemaId,
+        uint256 _modifier1Multiplier,
+        uint256 _modifier2Multiplier,
+        bool _enableModifiers
+    ) public onlyGovernance {
+        modifier1SchemaId = _modifier1SchemaId;
+        modifier2SchemaId = _modifier2SchemaId;
+        modifier1Multiplier = _modifier1Multiplier;
+        modifier2Multiplier = _modifier2Multiplier;
+        enableModifiers = _enableModifiers;
     }
 }
