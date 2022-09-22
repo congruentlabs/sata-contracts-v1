@@ -8,10 +8,15 @@ import "./SignataIdentity.sol";
 import "./SignataRight.sol";
 import "./ClaimRight.sol";
 
+interface SanctionsList {
+    function isSanctioned(address addr) external view returns (bool);
+}
+
 contract VeriswapERC20 is Ownable, ReentrancyGuard {
     SignataIdentity public signataIdentity;
     SignataRight public signataRight; // rights for checking schema ownership
     ClaimRight public claimRight; // claim rights for checking schema identifier for kyc
+    address public sanctionsContract; // sanctions list for checking if user is sanctioned
 
     enum States {
         INVALID,
@@ -20,7 +25,7 @@ contract VeriswapERC20 is Ownable, ReentrancyGuard {
         EXPIRED
     }
 
-    struct AtomicSwap {
+    struct EscrowSwap {
         address inputToken;
         uint256 inputAmount;
         address outputToken;
@@ -29,14 +34,15 @@ contract VeriswapERC20 is Ownable, ReentrancyGuard {
         address creator;
         bool requireIdentity;
         bool requireKyc;
+        bool requireSanctionCheck;
         States state;
     }
 
     bool public canSwap = true;
 
-    mapping(address => AtomicSwap) public swaps;
+    mapping(address => EscrowSwap) public swaps;
 
-    event SwapCreated(AtomicSwap swapData);
+    event SwapCreated(EscrowSwap swapData);
     event SwapExecuted(address creatorAddress);
     event SwapCancelled(address creatorAddress);
     event ExecutorModified(
@@ -47,15 +53,18 @@ contract VeriswapERC20 is Ownable, ReentrancyGuard {
     event IdentityContractChanged(SignataIdentity newIdentity);
     event RightsContractChanged(SignataRight newRights);
     event ClaimRightContractChanged(ClaimRight newClaimRight);
+    event SanctionsListChanged(address newSanctionsList);
 
     constructor(
         SignataIdentity _signataIdentity,
         SignataRight _signataRight,
-        ClaimRight _kycClaimRight
+        ClaimRight _kycClaimRight,
+        address _sanctionsContract
     ) {
         signataIdentity = _signataIdentity;
         signataRight = _signataRight;
         claimRight = _kycClaimRight;
+        sanctionsContract = _sanctionsContract;
     }
 
     function createSwap(
@@ -65,26 +74,41 @@ contract VeriswapERC20 is Ownable, ReentrancyGuard {
         uint256 _outputAmount,
         address _executor,
         bool _requireIdentity,
-        bool _requireKyc
+        bool _requireKyc,
+        bool _requireSanctionCheck
     ) public {
-        if (_requireIdentity) {
+        if (_requireIdentity == true) {
+            address senderId = signataIdentity.getIdentity(msg.sender);
             require(
-                !signataIdentity.isLocked(msg.sender),
-                "createSwap::creator must not be locked"
+                !signataIdentity.isLocked(senderId),
+                "createSwap::Creator must not be locked"
             );
             // don't check the executor yet, just in case they go and register after the fact.
         }
-        if (_requireKyc) {
+        if (_requireKyc == true) {
             require(
                 signataRight.holdsTokenOfSchema(
                     msg.sender,
                     claimRight.schemaId()
                 ),
-                "createSwap::Sender must have kyc nft"
+                "createSwap::Creator must have kyc nft"
             );
             // don't check the executor yet, just in case they go and kyc after the fact.
         }
-        AtomicSwap memory swapToCheck = swaps[msg.sender];
+
+        if (_requireSanctionCheck == true) {
+            SanctionsList sanctionsList = SanctionsList(sanctionsContract);
+            require(
+                !sanctionsList.isSanctioned(msg.sender),
+                "createSwap::Creator must not be sanctioned"
+            );
+            require(
+                !sanctionsList.isSanctioned(_executor),
+                "createSwap::Executor must not be sanctioned"
+            );
+        }
+
+        EscrowSwap memory swapToCheck = swaps[msg.sender];
         require(
             swapToCheck.state != States.OPEN,
             "createSwap::already have an open swap"
@@ -105,7 +129,7 @@ contract VeriswapERC20 is Ownable, ReentrancyGuard {
         );
 
         // store the details
-        AtomicSwap memory newSwap = AtomicSwap({
+        EscrowSwap memory newSwap = EscrowSwap({
             inputToken: _inputToken,
             inputAmount: _inputAmount,
             outputToken: _outputToken,
@@ -114,6 +138,7 @@ contract VeriswapERC20 is Ownable, ReentrancyGuard {
             creator: msg.sender,
             requireIdentity: _requireIdentity,
             requireKyc: _requireKyc,
+            requireSanctionCheck: _requireSanctionCheck,
             state: States.OPEN
         });
         swaps[msg.sender] = newSwap;
@@ -125,7 +150,7 @@ contract VeriswapERC20 is Ownable, ReentrancyGuard {
         require(canSwap, "executeSwap::swaps not enabled!");
 
         // check the state
-        AtomicSwap memory swapToExecute = swaps[creatorAddress];
+        EscrowSwap memory swapToExecute = swaps[creatorAddress];
 
         require(
             swapToExecute.state == States.OPEN,
@@ -135,20 +160,24 @@ contract VeriswapERC20 is Ownable, ReentrancyGuard {
             swapToExecute.executor == msg.sender,
             "executeSwap::only the executor can call this function"
         );
-
         // check identities
         if (swapToExecute.requireIdentity == true) {
+            // msg.sender will be the delegate key
+            address senderId = signataIdentity.getIdentity(msg.sender);
             require(
-                !signataIdentity.isLocked(msg.sender),
+                !signataIdentity.isLocked(senderId),
                 "executeSwap::Sender must not be locked"
             );
+            // and the executor will also be their delegate key
+            address executorId = signataIdentity.getIdentity(swapToExecute.executor);
             require(
-                !signataIdentity.isLocked(swapToExecute.executor),
-                "executeSwap::Trader must not be locked"
+                !signataIdentity.isLocked(executorId),
+                "executeSwap::Executor must not be locked"
             );
         }
 
         if (swapToExecute.requireKyc == true) {
+            // holds token takes the delegate key and looks up identity
             require(
                 signataRight.holdsTokenOfSchema(
                     msg.sender,
@@ -161,7 +190,19 @@ contract VeriswapERC20 is Ownable, ReentrancyGuard {
                     swapToExecute.executor,
                     claimRight.schemaId()
                 ),
-                "executeSwap::Trader must have kyc nft"
+                "executeSwap::Executor must have kyc nft"
+            );
+        }
+
+        if (swapToExecute.requireSanctionCheck == true) {
+            SanctionsList sanctionsList = SanctionsList(sanctionsContract);
+            require(
+                !sanctionsList.isSanctioned(msg.sender),
+                "executeSwap::Sender must not be sanctioned"
+            );
+            require(
+                !sanctionsList.isSanctioned(swapToExecute.executor),
+                "executeSwap::Executor must not be sanctioned"
             );
         }
 
@@ -196,7 +237,7 @@ contract VeriswapERC20 is Ownable, ReentrancyGuard {
     }
 
     function cancelSwap() external nonReentrant {
-        AtomicSwap memory swapToCancel = swaps[msg.sender];
+        EscrowSwap memory swapToCancel = swaps[msg.sender];
         require(
             swapToCancel.creator == msg.sender,
             "cancelSwap::not the creator"
@@ -222,7 +263,7 @@ contract VeriswapERC20 is Ownable, ReentrancyGuard {
             newExecutor != address(0),
             "changeExecutor::cannot set to 0 address"
         );
-        AtomicSwap memory swapToChange = swaps[msg.sender];
+        EscrowSwap memory swapToChange = swaps[msg.sender];
 
         address oldExecutor = swaps[msg.sender].executor;
 
@@ -256,16 +297,40 @@ contract VeriswapERC20 is Ownable, ReentrancyGuard {
         external
         onlyOwner
     {
+        require(
+            address(newIdentity) != address(signataIdentity),
+            "updateSignataIdentity::not different values"
+        );
         signataIdentity = newIdentity;
         emit IdentityContractChanged(newIdentity);
     }
 
     function updateSignataRight(SignataRight newRights) external onlyOwner {
+        require(
+            address(newRights) != address(signataRight),
+            "updateSignataRight::not different values"
+        );
         signataRight = newRights;
         emit RightsContractChanged(newRights);
     }
 
+    function updateSanctionsList(address newSanctionsContract)
+        external
+        onlyOwner
+    {
+        require(
+            newSanctionsContract != address(sanctionsContract),
+            "updateSanctionsList::not different values"
+        );
+        sanctionsContract = newSanctionsContract;
+        emit SanctionsListChanged(newSanctionsContract);
+    }
+
     function updateClaimRight(ClaimRight newClaimRight) external onlyOwner {
+        require(
+            address(newClaimRight) != address(claimRight),
+            "updateClaimRight::not different values"
+        );
         claimRight = newClaimRight;
         emit ClaimRightContractChanged(newClaimRight);
     }
