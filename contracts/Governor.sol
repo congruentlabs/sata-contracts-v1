@@ -173,7 +173,10 @@ contract SignataGovernor is
         signataRight = _signataRight;
     }
 
-    function reinstateExpirationBlock() {
+    function reinstateExpirationBlock()
+        public
+        onlyGovernance
+    {
         modifierExpiration = now + 365 days;
     }
 
@@ -183,7 +186,10 @@ contract SignataGovernor is
         uint256 _modifier1Multiplier,
         uint256 _modifier2Multiplier,
         bool _enableModifiers
-    ) public onlyGovernance {
+    )
+        public
+        onlyGovernance
+    {
         modifier1SchemaId = _modifier1SchemaId;
         modifier2SchemaId = _modifier2SchemaId;
         modifier1Multiplier = _modifier1Multiplier;
