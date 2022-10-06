@@ -15,8 +15,8 @@ interface ISignataRight {
         bool unbound
     ) external;
 
-    function holdsTokenOfSchema(
-        address holder,
-        uint256 schemaId
-    ) external view returns (bool);
+    function holdsTokenOfSchema(address holder, uint256 schemaId)
+        external
+        view
+        returns (bool);
 }
