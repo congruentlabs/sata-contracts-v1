@@ -5,21 +5,7 @@ import "./openzeppelin/contracts/access/Ownable.sol";
 import "./openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./tokens/IERC721Receiver.sol";
 import "./openzeppelin/contracts/security/ReentrancyGuard.sol";
-
-interface ISignataRight {
-    function mintSchema(
-        address minter,
-        bool schemaTransferable,
-        bool schemaRevocable,
-        string calldata schemaURI
-    ) external returns (uint256);
-
-    function mintRight(
-        uint256 schemaId,
-        address to,
-        bool unbound
-    ) external;
-}
+import "./interfaces/ISignataRight.sol";
 
 contract ClaimRight is Ownable, IERC721Receiver, ReentrancyGuard {
     string public name;

@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.16;
 
-import "./SignataIdentity.sol";
-import "./SignataRight.sol";
+import "./interfaces/ISignataIdentity.sol";
+import "./interfaces/ISignataRight.sol";
 import "./openzeppelin/contracts/access/Ownable.sol";
 import "./openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./tokens/IERC721Receiver.sol";
@@ -11,8 +11,7 @@ import "./openzeppelin/contracts/security/ReentrancyGuard.sol";
 contract PurchaseRight is Ownable, IERC721Receiver, ReentrancyGuard {
     string public name;
     IERC20 public paymentToken;
-    SignataRight public signataRight;
-    SignataIdentity public signataIdentity;
+    ISignataRight public signataRight;
     uint256 public feeAmount = 100 * 1e18;
     uint256 public schemaId;
     bytes4 private constant _ERC721_RECEIVED = 0x150b7a02;
@@ -28,14 +27,12 @@ contract PurchaseRight is Ownable, IERC721Receiver, ReentrancyGuard {
     event PurchasesEnabledModified(bool newValue);
 
     constructor(
-        address _paymentToken,
-        address _signataRight,
-        address _signataIdentity,
+        IERC20 _paymentToken,
+        ISignataRight _signataRight,
         string memory _name
     ) {
-        paymentToken = IERC20(_paymentToken);
-        signataRight = SignataRight(_signataRight);
-        signataIdentity = SignataIdentity(_signataIdentity);
+        paymentToken = _paymentToken;
+        signataRight = _signataRight;
         name = _name;
     }
 

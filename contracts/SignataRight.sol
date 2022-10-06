@@ -9,7 +9,6 @@ import "./tokens/IERC721Receiver.sol";
 import "./tokens/IERC721Schema.sol";
 
 import "./SignataIdentity.sol";
-
 import "./types/extensions/Address.sol";
 
 contract SignataRight is IERC721Schema {

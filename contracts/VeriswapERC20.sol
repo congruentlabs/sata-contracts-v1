@@ -4,8 +4,8 @@ pragma solidity ^0.8.14;
 import "./openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./openzeppelin/contracts/access/Ownable.sol";
 import "./openzeppelin/contracts/security/ReentrancyGuard.sol";
-import "./SignataIdentity.sol";
-import "./SignataRight.sol";
+import "./interfaces/ISignataRight.sol";
+import "./interfaces/ISignataIdentity.sol";
 import "./ClaimRight.sol";
 
 interface SanctionsList {
@@ -13,8 +13,8 @@ interface SanctionsList {
 }
 
 contract VeriswapERC20 is Ownable, ReentrancyGuard {
-    SignataIdentity public signataIdentity;
-    SignataRight public signataRight; // rights for checking schema ownership
+    ISignataIdentity public signataIdentity;
+    ISignataRight public signataRight; // rights for checking schema ownership
     ClaimRight public claimRight; // claim rights for checking schema identifier for kyc
     address public sanctionsContract; // sanctions list for checking if user is sanctioned
 
@@ -50,14 +50,14 @@ contract VeriswapERC20 is Ownable, ReentrancyGuard {
         address oldExecutor,
         address newExecutor
     );
-    event IdentityContractChanged(SignataIdentity newIdentity);
-    event RightsContractChanged(SignataRight newRights);
+    event IdentityContractChanged(ISignataIdentity newIdentity);
+    event RightsContractChanged(ISignataRight newRights);
     event ClaimRightContractChanged(ClaimRight newClaimRight);
     event SanctionsListChanged(address newSanctionsList);
 
     constructor(
-        SignataIdentity _signataIdentity,
-        SignataRight _signataRight,
+        ISignataIdentity _signataIdentity,
+        ISignataRight _signataRight,
         ClaimRight _kycClaimRight,
         address _sanctionsContract
     ) {
@@ -293,7 +293,7 @@ contract VeriswapERC20 is Ownable, ReentrancyGuard {
         canSwap = false;
     }
 
-    function updateSignataIdentity(SignataIdentity newIdentity)
+    function updateSignataIdentity(ISignataIdentity newIdentity)
         external
         onlyOwner
     {
@@ -305,7 +305,7 @@ contract VeriswapERC20 is Ownable, ReentrancyGuard {
         emit IdentityContractChanged(newIdentity);
     }
 
-    function updateSignataRight(SignataRight newRights) external onlyOwner {
+    function updateSignataRight(ISignataRight newRights) external onlyOwner {
         require(
             address(newRights) != address(signataRight),
             "updateSignataRight::not different values"
