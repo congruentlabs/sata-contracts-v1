@@ -174,6 +174,11 @@ contract SignataIdentityV2 {
             "SignataIdentityV2: Not authorized to delete delegate."
         );
 
+        require(
+            identity != delegateToRemove,
+            "SignataIdentityV2: Cannot remove self delegation"
+        );
+
         delete canLock[identity][delegateToRemove];
         delete canUnlock[identity][delegateToRemove];
         delete canDestroy[identity][delegateToRemove];
