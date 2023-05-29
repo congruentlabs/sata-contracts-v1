@@ -2,6 +2,8 @@
 
 pragma solidity ^0.8.0;
 
+import "./ISignataIdentityV2.sol";
+
 /**
 Contract Overview
 The contract represents an identity management system where each address can have certain permissions (roles) assigned to it. The following storage mappings are used:
@@ -16,7 +18,7 @@ canDestroy: Specifies whether an address can destroy a specific identity.
 canDelegate: Specifies whether an address can delegate its permissions to another address.
 The contract provides functions to create, destroy, lock, and unlock identities. It also allows adding and removing delegates who can perform actions on behalf of the identity.
 */
-contract SignataIdentityV2 {
+contract SignataIdentityV2 is ISignataIdentityV2 {
     uint256 public constant MAX_UINT256 = type(uint256).max;
     // storage
     mapping(address => uint256) public identityLockCount;
@@ -29,25 +31,6 @@ contract SignataIdentityV2 {
     mapping(address => mapping(address => bool)) public canDelegate;
 
     constructor() {}
-
-    event Create(address indexed identity);
-    event Destroy(address indexed identity, address indexed sender);
-    event Lock(address indexed identity, address indexed sender);
-    event Unlock(address indexed identity, address indexed sender);
-    event DelegateAdded(
-        address indexed identity,
-        address indexed newDelegate,
-        address indexed sender,
-        bool canLock,
-        bool canUnlock,
-        bool canDestroy,
-        bool canDelegate
-    );
-    event DelegateRemoved(
-        address indexed identity,
-        address indexed removedDelegate,
-        address sender
-    );
 
     modifier exists(address identity) {
         require(
@@ -106,12 +89,12 @@ contract SignataIdentityV2 {
     */
     function destroy(address identity) external exists(identity) {
         require(
-            !identityDestroyed[identity],
+            identityDestroyed[identity] != true,
             "SignataIdentityV2: The identity has already been destroyed."
         );
 
         require(
-            canDestroy[identity][msg.sender],
+            canDestroy[identity][msg.sender] == true,
             "SignataIdentityV2:Not authorized to destroy identity."
         );
 
