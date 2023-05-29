@@ -1,641 +1,289 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.11;
 
-import "./tokens/IERC165.sol";
-import "./tokens/IERC721.sol";
-import "./tokens/IERC721Enumerable.sol";
-import "./tokens/IERC721Metadata.sol";
-import "./tokens/IERC721Receiver.sol";
-import "./tokens/IERC721Schema.sol";
+import "./ISignataIdentityV2.sol";
+import "./ERC6150AccessControl.sol";
+import "./ERC6150ParentTransferable.sol";
+import "./interfaces/IERC5192.sol";
+import "./interfaces/IERC6147.sol";
+import "./interfaces/IERC5484.sol";
 
-import "./SignataIdentityV2.sol";
-import "./types/extensions/Address.sol";
+contract SignataRightV2 is
+    ERC6150AccessControl,
+    ERC6150ParentTransferable,
+    IERC5192,
+    IERC6147,
+    IERC5484
+{
+    ISignataIdentityV2 public _signataIdentity;
+    mapping(uint256 => uint256) private _parentOf;
+    mapping(uint256 => uint256[]) private _childrenOf;
+    mapping(uint256 => uint256) private _indexInChildrenArray;
+    mapping(uint256 => bool) internal _locked;
 
-contract SignataRightV2 is IERC721Schema {
-    using Address for address;
-    
-    event MintSchema(uint256 indexed schemaId, uint256 indexed mintingRightId, bytes32 indexed uriHash);
-    
-    event MintRight(uint256 indexed schemaId, uint256 indexed rightId, bool indexed unbound);
-    
-    event Revoke(uint256 indexed rightId);
-    
-    uint256 private constant MAX_UINT256 = type(uint256).max;
-    
-    bytes4 private constant INTERFACE_ID_ERC165 = type(IERC165).interfaceId;
-    bytes4 private constant INTERFACE_ID_ERC721 = type(IERC721).interfaceId;
-    bytes4 private constant INTERFACE_ID_ERC721_ENUMERABLE = type(IERC721Enumerable).interfaceId;
-    bytes4 private constant INTERFACE_ID_ERC721_METADATA = type(IERC721Metadata).interfaceId;
-    bytes4 private constant INTERFACE_ID_ERC721_SCHEMA = type(IERC721Schema).interfaceId;
+    /// @dev A structure representing a token of guard address and expires
+    /// @param guard address of guard role
+    /// @param expirs UNIX timestamp, the guard could manage the token before expires
+    struct GuardInfo {
+        address guard;
+        uint64 expires;
+    }
+    mapping(uint256 => GuardInfo) internal _guardInfo;
 
-    string private _name;
-    string private _symbol;
-    SignataIdentityV2 private _signataIdentity;
-    
-    // Schema Storage
-    mapping(uint256 => uint256) private _schemaToRightBalance;
-    mapping(uint256 => mapping(uint256 => uint256)) private _schemaToRights;
-    mapping(uint256 => bool) _schemaRevocable;
-    mapping(uint256 => bool) _schemaTransferable;
-    mapping(uint256 => string) private _schemaToURI;
-    mapping(bytes32 => uint256) private _uriHashToSchema;
-    mapping(uint256 => uint256) private _schemaToMintingRight;
-    mapping(address => mapping(uint256 => uint256)) _ownerToSchemaBalance;
-    uint256 private _schemasTotal;
-    
-    // Rights Storage
-    mapping(uint256 => address) private _rightToOwner;
-    mapping(address => uint256) private _ownerToRightBalance;
-    mapping(uint256 => address) private _rightToApprovedAddress;
-    mapping(uint256 => bool) private _rightToRevocationStatus;
-    mapping(uint256 => uint256) private _rightToSchema;
-    mapping(address => mapping (address => bool)) private _ownerToOperatorStatuses;
-    mapping(address => mapping(uint256 => uint256)) private _ownerToRights;
-    mapping(uint256 => uint256) _rightToOwnerRightsIndex;
-    uint256 private _rightsTotal;
-    
-    constructor(
-        string memory name_, 
-        string memory symbol_,
-        address signataIdentity_,
-        string memory mintingSchemaURI_
-    ) {
-        address thisContract = address(this);
-        bytes32 uriHash = keccak256(bytes(mintingSchemaURI_));
+    error ErrLocked();
 
-        _name = name_;
-        _symbol = symbol_;
-
-        _signataIdentity = SignataIdentityV2(signataIdentity_);
-
-        _schemaToRightBalance[1] = 1;
-        _schemaToRights[1][0] = 1;
-        _schemaRevocable[1] = false;
-        _schemaTransferable[1] = true;
-        _schemaToURI[1] = mintingSchemaURI_;
-        _uriHashToSchema[uriHash] = 1;
-        _schemaToMintingRight[1] = 1;
-        _ownerToSchemaBalance[thisContract][1] = 1;
-        _schemasTotal = 1;
-
-        _rightToOwner[1] = thisContract;
-        _ownerToRightBalance[thisContract] = 1;
-        _rightToSchema[1] = 1;
-        _ownerToRights[thisContract][0] = 1;
-        _rightToOwnerRightsIndex[1] = 0;
-        _rightsTotal = 1;
-        
-        emit MintSchema(1, 1, uriHash);
-        
-        emit MintRight(1, 1, false);
-        
-        emit Transfer(address(0), thisContract, 1);
+    modifier notLocked(uint256 tokenId) {
+        if (_locked[tokenId]) revert ErrLocked();
+        _;
     }
 
-    function supportsInterface(bytes4 interfaceId) public pure override returns (bool) {
-        return interfaceId == INTERFACE_ID_ERC165
-            || interfaceId == INTERFACE_ID_ERC721
-            || interfaceId == INTERFACE_ID_ERC721_ENUMERABLE
-            || interfaceId == INTERFACE_ID_ERC721_METADATA
-            || interfaceId == INTERFACE_ID_ERC721_SCHEMA;
+    constructor(address signataIdentity) ERC6150("Signata Right", "SATARIGHT") {
+        _signataIdentity = ISignataIdentityV2(signataIdentity);
     }
-    
-    function mintSchema(
-        address minter,
-        bool schemaTransferable, 
-        bool schemaRevocable, 
-        string calldata schemaURI
-    ) external returns (uint256) {
-        require(
-            _schemasTotal != MAX_UINT256,
-            "SignataRight: Maximum amount of schemas already minted."
-        );
-        
-        require(
-            _rightsTotal != MAX_UINT256,
-            "SignataRight: Maximum amount of rights already minted."
-        );
-        
-        bytes32 uriHash = keccak256(bytes(schemaURI));
-        
-        require(
-            _uriHashToSchema[uriHash] == 0,
-            "SignataRight: The URI provided for the schema is not unique."
-        );
-        
-        address recipient;
-        
-        if (minter.isContract()) {
-            recipient = minter;
+
+    function locked(uint256 tokenId) external view override returns (bool) {
+        return _locked[tokenId];
+    }
+
+    function burnAuth(
+        uint256 tokenId
+    ) external view override returns (BurnAuth) {
+        // return _locked[tokenId];
+    }
+
+    /// @notice Owner, authorised operators and approved address of the NFT can set guard and expires of the NFT and
+    ///         valid guard can modifiy guard and expires of the NFT
+    ///         If the NFT has a valid guard role, the owner, authorised operators and approved address of the NFT
+    ///         cannot modify guard and expires
+    /// @dev The `newGuard` can not be zero address
+    ///      The `expires` need to be valid
+    ///      Throws if `tokenId` is not valid NFT
+    /// @param tokenId The NFT to get the guard address for
+    /// @param newGuard The new guard address of the NFT
+    /// @param expires UNIX timestamp, the guard could manage the token before expires
+    function changeGuard(
+        uint256 tokenId,
+        address newGuard,
+        uint64 expires
+    ) public virtual {
+        require(expires > block.timestamp, "ERC6147: invalid expires");
+        _updateGuard(tokenId, newGuard, expires, false);
+    }
+
+    /// @notice Remove the guard and expires of the NFT
+    ///         Only guard can remove its own guard role and expires
+    /// @dev The guard address is set to 0 address
+    ///      The expires is set to 0
+    ///      Throws if `tokenId` is not valid NFT
+    /// @param tokenId The NFT to remove the guard and expires for
+    function removeGuard(uint256 tokenId) public virtual {
+        _updateGuard(tokenId, address(0), 0, true);
+    }
+
+    /// @notice Transfer the NFT and remove its guard and expires
+    /// @dev The NFT is transferred to `to` and the guard address is set to 0 address
+    ///      Throws if `tokenId` is not valid NFT
+    /// @param from The address of the previous owner of the NFT
+    /// @param to The address of NFT recipient
+    /// @param tokenId The NFT to get transferred for
+    function transferAndRemove(
+        address from,
+        address to,
+        uint256 tokenId
+    ) public virtual {
+        safeTransferFrom(from, to, tokenId);
+        removeGuard(tokenId);
+    }
+
+    /// @notice Get the guard address and expires of the NFT
+    /// @dev The zero address indicates that there is no guard
+    /// @param tokenId The NFT to get the guard address and expires for
+    /// @return The guard address and expires for the NFT
+    function guardInfo(
+        uint256 tokenId
+    ) public view virtual returns (address, uint64) {
+        if (_guardInfo[tokenId].expires >= block.timestamp) {
+            return (_guardInfo[tokenId].guard, _guardInfo[tokenId].expires);
         } else {
-            recipient = _signataIdentityV2.getIdentity(minter);
-            
+            return (address(0), 0);
+        }
+    }
+
+    /// @notice Update the guard of the NFT
+    /// @dev Delete function: set guard to 0 address and set expires to 0;
+    ///      and update function: set guard to new address and set expires
+    ///      Throws if `tokenId` is not valid NFT
+    /// @param tokenId The NFT to update the guard address for
+    /// @param newGuard The newGuard address
+    /// @param expires UNIX timestamp, the guard could manage the token before expires
+    /// @param allowNull Allow 0 address
+    function _updateGuard(
+        uint256 tokenId,
+        address newGuard,
+        uint64 expires,
+        bool allowNull
+    ) internal {
+        (address guard, ) = guardInfo(tokenId);
+        if (!allowNull) {
             require(
-                !_signataIdentity.isLocked(recipient),
-                "SignataRight: The sender's account is locked."
+                newGuard != address(0),
+                "ERC6147: new guard can not be null"
             );
         }
-        
-        _rightsTotal += 1;
-        _rightToOwner[_rightsTotal] = recipient;
-        _rightToSchema[_rightsTotal] = 1;
-        
-        uint256 schemaToRightsLength = _schemaToRightBalance[1];
-
-        _schemaToRights[1][schemaToRightsLength] = _rightsTotal;
-        _schemaToRightBalance[1] += 1;
-        _ownerToSchemaBalance[recipient][1] += 1;
-
-        uint256 ownerToRightsLength = _ownerToRightBalance[recipient];
-        
-        _ownerToRights[recipient][ownerToRightsLength] = _rightsTotal;
-        _rightToOwnerRightsIndex[_rightsTotal] = ownerToRightsLength;
-        _ownerToRightBalance[recipient] += 1;
-        
-        _schemasTotal += 1;
-        _schemaToMintingRight[_schemasTotal] = _rightsTotal;
-        _schemaToURI[_schemasTotal] = schemaURI;
-        _uriHashToSchema[uriHash] = _schemasTotal;
-        _schemaTransferable[_schemasTotal] = schemaTransferable;
-        _schemaRevocable[_schemasTotal] = schemaRevocable;
-        
-        require(
-            _isSafeToTransfer(address(0), recipient, _rightsTotal, ""),
-            "SignataRight: must only transfer to ERC721Receiver implementers when recipient is a smart contract."
-        );
-        
-        emit MintRight(1, _rightsTotal, false);
-        
-        emit Transfer(address(0), minter, _rightsTotal);
-        
-        emit MintSchema(_schemasTotal, _rightsTotal, uriHash);
-        
-        return _schemasTotal;
-    }
-    
-    function mintRight(uint256 schemaId, address to, bool unbound) external {
-        require(
-            _rightsTotal != MAX_UINT256,
-            "SignataRight: Maximum amount of tokens already minted."
-        );
-        
-        require(
-            _schemaToMintingRight[schemaId] != 0,
-            "SignataRight: Schema ID must correspond to an existing schema."
-        );
-
-        address minter;
-        
-        if (msg.sender.isContract()) {
-            minter = msg.sender;
-        } else {
-            minter = _signataIdentity.getIdentity(msg.sender);
-            
+        if (guard != address(0)) {
             require(
-                !_signataIdentity.isLocked(minter),
-                "SignataRight: The sender's account is locked."
+                guard == msg.sender,
+                "ERC6147: only guard can change it self"
             );
-        }
-        
-        require(
-            minter == _rightToOwner[_schemaToMintingRight[schemaId]],
-            "SignataRight: The sender is not the minter for the schema specified."
-        );
-        
-        address recipient;
-        
-        if (to.isContract()) {
-            recipient = to;
-        } else if (unbound == true) {
-            recipient = to;
         } else {
-            recipient = _signataIdentity.getIdentity(to);
-        }
-        
-        _rightsTotal += 1;
-        _rightToOwner[_rightsTotal] = recipient;
-        _rightToSchema[_rightsTotal] = schemaId;
-        
-        uint256 schemaToRightsLength = _schemaToRightBalance[schemaId];
-
-        _schemaToRights[schemaId][schemaToRightsLength] = _rightsTotal;
-        _schemaToRightBalance[schemaId] += 1;
-        _ownerToSchemaBalance[recipient][schemaId] += 1;
-
-        uint256 ownerToRightsLength = _ownerToRightBalance[recipient];
-        
-        _ownerToRights[recipient][ownerToRightsLength] = _rightsTotal;
-        _rightToOwnerRightsIndex[_rightsTotal] = ownerToRightsLength;
-        _ownerToRightBalance[recipient] += 1;
-        
-        require(
-            _isSafeToTransfer(address(0), recipient, _rightsTotal, ""),
-            "SignataRight: must only transfer to ERC721Receiver implementers when recipient is a smart contract."
-        );
-        
-        emit MintRight(schemaId, _rightsTotal, unbound);
-        
-        emit Transfer(address(0), to, _rightsTotal);
-    }
-
-    function balanceOf(address owner) public view override returns (uint256) {
-        if (owner.isContract()) {
-            return _ownerToRightBalance[owner];
-        }
-        
-        return _ownerToRightBalance[_signataIdentity.getIdentity(owner)];
-    }
-
-    function ownerOf(uint256 tokenId) public view override returns (address) {
-        address owner = _rightToOwner[tokenId];
-        
-        require(
-            owner != address(0),
-            "SignataRight: Token ID must correspond to an existing right."
-        );
-        
-        if (owner.isContract()) {
-            return owner;
-        }
-        
-        return _signataIdentity.getDelegate(owner);
-    }
-
-    function name() public view override returns (string memory) {
-        return _name;
-    }
-
-    function symbol() public view override returns (string memory) {
-        return _symbol;
-    }
-
-    function tokenURI(uint256 tokenId) external view override returns (string memory) {
-        require(
-            _rightToOwner[tokenId] != address(0), 
-            "SignataRight: Token ID must correspond to an existing right."
-        );
-
-        return _schemaToURI[_rightToSchema[tokenId]];
-    }
-
-    function approve(address to, uint256 tokenId) external override {
-        address owner = _rightToOwner[tokenId];
-        
-        require(
-            owner != address(0),
-            "SignataRight: Token ID must correspond to an existing right."
-        );
-        
-        require(
-            to != owner, 
-            "SignataRight: Approval is not required for the owner of the right."
-        );
-        
-        address controller;
-        
-        if (owner.isContract()) {
-            controller = owner;
-        } else {
-            controller = _signataIdentity.getDelegate(owner);
-            
             require(
-                to != controller, 
-                "SignataRight: Approval is not required for the owner of the right."
-            );
-            
-            require(
-                !_signataIdentity.isLocked(owner),
-                "SignataRight: The owner's account is locked."
-            );
-        }
-            
-        require(
-            msg.sender == controller || isApprovedForAll(owner, msg.sender),
-            "SignataRight: The sender is not authorised to provide approvals."
-        );
-        
-        _rightToApprovedAddress[tokenId] = to;
-    
-        emit Approval(controller, to, tokenId);
-    }
-    
-    function revoke(uint256 tokenId) external {
-        require(
-            _rightToOwner[tokenId] != address(0),
-            "SignataRight: Right ID must correspond to an existing right."
-        );
-        
-        uint256 schemaId = _rightToSchema[tokenId];
-        
-        require(
-            _schemaRevocable[schemaId],
-            "SignataRight: The right specified is not revocable."
-        );
-        
-        address minter = _rightToOwner[_schemaToMintingRight[schemaId]];
-        
-        address controller;
-        
-        if (minter.isContract()) {
-            controller = minter;
-        } else {
-            controller = _signataIdentity.getDelegate(minter);
-            
-            require(
-                !_signataIdentity.isLocked(minter),
-                "SignataRight: The minter's account is locked."
-            );
-        }
-            
-        require(
-            msg.sender == controller,
-            "SignataRight: The sender is not authorised to revoke the right."
-        );
-        
-        _rightToRevocationStatus[tokenId] = true;
-
-        _ownerToSchemaBalance[_rightToOwner[tokenId]][schemaId] -= 1;
-    
-        emit Revoke(tokenId);        
-    }
-    
-    function isRevoked(uint256 tokenId) external view returns (bool) {
-        require(
-            _rightToOwner[tokenId] != address(0),
-            "SignataRight: Token ID must correspond to an existing right."
-        );
-        
-        return _rightToRevocationStatus[tokenId];
-    }
-
-    function getApproved(uint256 tokenId) public view override returns (address) {
-        require(
-            _rightToOwner[tokenId] != address(0),
-            "SignataRight: Token ID must correspond to an existing right."
-        );
-
-        return _rightToApprovedAddress[tokenId];
-    }
-
-    function setApprovalForAll(address operator, bool approved) public override {
-        address owner;
-        
-        require(
-            operator != msg.sender, 
-            "SignataRight: Self-approval is not required."
-        );
-        
-        if (msg.sender.isContract()) {
-            owner = msg.sender;
-        } else {
-            owner = _signataIdentity.getIdentity(msg.sender);
-            
-            require(
-                operator != owner, 
-                "SignataRight: Self-approval is not required."
-            );
-            
-            require(
-                !_signataIdentity.isLocked(owner),
-                "SignataRight: The owner's account is locked."
+                _isApprovedOrOwner(msg.sender, tokenId),
+                "ERC6147: caller is not owner nor approved"
             );
         }
 
-        _ownerToOperatorStatuses[owner][operator] = approved;
-        
-        emit ApprovalForAll(owner, operator, approved);
+        if (guard != address(0) || newGuard != address(0)) {
+            _guardInfo[tokenId] = GuardInfo(newGuard, expires);
+            emit UpdateGuardLog(tokenId, newGuard, guard, expires);
+        }
     }
 
-    function isApprovedForAll(address owner, address operator) public view override returns (bool) {
-        address owner_ = (owner.isContract())
-            ? owner
-            :_signataIdentity.getIdentity(msg.sender);
-            
-        return _ownerToOperatorStatuses[owner_][operator];
-    }
-
-    function transferFrom(address from, address to, uint256 tokenId) public override {
-        require(
-            _rightToOwner[tokenId] != address(0),
-            "SignataRight: Token ID must correspond to an existing right."
-        );
-        
-        uint256 schemaId = _rightToSchema[tokenId];
-        
-        require(
-            _schemaTransferable[schemaId],
-            "SignataRight: This right is non-transferable."
-        );
-        
-        require(
-            !_rightToRevocationStatus[tokenId],
-            "SignataRight: This right has been revoked."
-        );
-        
-        require(
-            to != address(0), 
-            "SignataRight: Transfers to the zero address are not allowed."
-        );
-        
-        address owner;
-        
-        if (from.isContract()) {
-            owner = from;
-        } else {
-            owner = _signataIdentity.getIdentity(from);
-            
+    /// @notice Check the guard address
+    /// @dev The zero address indicates there is no guard
+    /// @param tokenId The NFT to check the guard address for
+    /// @return The guard address
+    function _checkGuard(uint256 tokenId) internal view returns (address) {
+        (address guard, ) = guardInfo(tokenId);
+        address sender = _msgSender();
+        if (guard != address(0)) {
             require(
-                !_signataIdentity.isLocked(owner),
-                "SignataRight: The owner's account is locked."
+                guard == sender,
+                "ERC6147: sender is not guard of the token"
+            );
+            return guard;
+        } else {
+            return address(0);
+        }
+    }
+
+    /// @dev Before transferring the NFT, need to check the guard address
+    function transferFrom(
+        address from,
+        address to,
+        uint256 tokenId
+    ) public virtual override(ERC721, IERC721) {
+        address guard;
+        address new_from = from;
+        if (from != address(0)) {
+            guard = _checkGuard(tokenId);
+            new_from = ownerOf(tokenId);
+        }
+        if (guard == address(0)) {
+            require(
+                _isApprovedOrOwner(_msgSender(), tokenId),
+                "ERC721: transfer caller is not owner nor approved"
             );
         }
-        
-        require(
-            _rightToOwner[tokenId] == owner,
-            "SignataRight: The account specified does not hold the right corresponding to the Token ID provided."
-        );
-        
+        _transfer(new_from, to, tokenId);
+    }
 
-        require(
-            msg.sender == owner || msg.sender == _rightToApprovedAddress[tokenId] || _ownerToOperatorStatuses[owner][msg.sender],
-            "SignataRight: The sender is not authorised to transfer this right."
-        );
-        
-        address recipient;
-
-        if (to.isContract()) {
-            recipient = to;
-        } else {
-            recipient = _signataIdentity.getIdentity(to);
-            
+    /// @dev Before safe transferring the NFT, need to check the guard address
+    function safeTransferFrom(
+        address from,
+        address to,
+        uint256 tokenId,
+        bytes memory _data
+    ) public virtual override(ERC721, IERC721) {
+        address guard;
+        address new_from = from;
+        if (from != address(0)) {
+            guard = _checkGuard(tokenId);
+            new_from = ownerOf(tokenId);
+        }
+        if (guard == address(0)) {
             require(
-                !_signataIdentity.isLocked(recipient),
-                "SignataRight: The recipient's account is locked."
+                _isApprovedOrOwner(_msgSender(), tokenId),
+                "ERC721: transfer caller is not owner nor approved"
             );
         }
-        
-        uint256 lastRightIndex = _ownerToRightBalance[owner] - 1;
-        uint256 rightIndex = _rightToOwnerRightsIndex[tokenId];
-
-        if (rightIndex != lastRightIndex) {
-            uint256 lastTokenId = _ownerToRights[owner][lastRightIndex];
-
-            _ownerToRights[owner][rightIndex] = lastTokenId;
-            _rightToOwnerRightsIndex[lastTokenId] = rightIndex;
-        }
-
-        delete _ownerToRights[owner][lastRightIndex];
-        delete _rightToOwnerRightsIndex[tokenId];
-        
-        _ownerToSchemaBalance[owner][schemaId] -= 1;
-        
-        uint256 length = _ownerToRightBalance[recipient];
-        
-        _ownerToRights[recipient][length] = tokenId;
-        _rightToOwnerRightsIndex[tokenId] = length;
-        
-        _rightToApprovedAddress[tokenId] = address(0);
-        
-        emit Approval(from, address(0), tokenId);
-
-        _ownerToRightBalance[owner] -= 1;
-        _ownerToRightBalance[recipient] += 1;
-        _rightToOwner[tokenId] = recipient;
-        
-        _ownerToSchemaBalance[recipient][schemaId] += 1;
-
-        emit Transfer(from, to, tokenId);
+        _safeTransfer(from, to, tokenId, _data);
     }
 
-    function safeTransferFrom(address from, address to, uint256 tokenId) external override {
-        safeTransferFrom(from, to, tokenId, "");
+    /// @dev When burning, delete `token_guard_map[tokenId]`
+    /// This is an internal function that does not check if the sender is authorized to operate on the token.
+    function _burn(uint256 tokenId) internal virtual override {
+        (address guard, ) = guardInfo(tokenId);
+        super._burn(tokenId);
+        delete _guardInfo[tokenId];
+        emit UpdateGuardLog(tokenId, address(0), guard, 0);
     }
 
-    function safeTransferFrom(address from, address to, uint256 tokenId, bytes memory _data) public override {
-        transferFrom(from, to, tokenId);
-        
-        require(
-            _isSafeToTransfer(from, to, tokenId, _data),
-            "SignataRight: must only transfer to ERC721Receiver implementers when recipient is a smart contract."
-        );
-    }
-    
-    function tokenOfOwnerByIndex(address owner, uint256 index) public view override returns (uint256) {
-        address holder;
-        
-        if (owner.isContract()) {
-            holder = owner;
-        } else {
-            holder = _signataIdentity.getIdentity(owner);
-        }
-        
-        require(
-            index < _ownerToRightBalance[holder], 
-            "SignataRight: The index provided is out of bounds for the owner specified."
-        );
-        
-        return _ownerToRights[holder][index];
+    /// @dev See {IERC165-supportsInterface}.
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public view virtual override(ERC6150, IERC165) returns (bool) {
+        return super.supportsInterface(interfaceId);
     }
 
-    function totalSupply() public view override returns (uint256) {
-        return _rightsTotal;
-    }
-
-    function tokenByIndex(uint256 index) public view override returns (uint256) {
-        require(
-            index < _rightsTotal, 
-            "SignataRight: The index provided is out of bounds."
-        );
-        
-        return index + 1;
-    }
-    
-    function schemaOf(uint256 tokenId) external view override returns (uint256) {
-        require(
-            _rightToOwner[tokenId] != address(0),
-            "SignataRight: Token ID must correspond to an existing right."
-        );
-
-        return _rightToSchema[tokenId];    
-    }
-
-    function minterOf(uint256 schemaId) external view override returns (address) {
-        uint256 mintingToken = _schemaToMintingRight[schemaId];
-        
-        require(
-            mintingToken != 0,
-            "SignataRight: Schema ID must correspond to an existing schema."
-        );
-        
-        address owner = _rightToOwner[mintingToken];
-
-        if (owner.isContract()) {
-            return owner;
-        }
-        
-        return _signataIdentity.getDelegate(owner);        
-    }
-    
-    function holdsTokenOfSchema(address holder, uint256 schemaId) external view override returns (bool) {
-        require(
-            _schemaToMintingRight[schemaId] != 0,
-            "SignataRight: Schema ID must correspond to an existing schema."
-        );
-        
-        address owner;
-
-        if (owner.isContract()) {
-            owner = holder;
-        } else {
-            owner = _signataIdentity.getIdentity(holder);
-        }
-        
-        return _ownerToSchemaBalance[owner][schemaId] > 0;
-    }
-    
-    function totalSchemas() external view override returns (uint256) {
-        return _schemasTotal;
-    }
-    
-    function totalMintedFor(uint256 schemaId) external view override returns (uint256) {
-        require(
-            _schemaToMintingRight[schemaId] != 0,
-            "SignataRight: Schema ID must correspond to an existing schema."
-        );
-        
-        return _schemaToRightBalance[schemaId];
-    }
-
-    function tokenOfSchemaByIndex(uint256 schemaId, uint256 index) external view override returns (uint256) {
-        require(
-            _schemaToMintingRight[schemaId] != 0,
-            "SignataRight: Schema ID must correspond to an existing schema."
-        );
-        
-        require(
-            index < _schemaToRightBalance[schemaId], 
-            "SignataRight: The index provided is out of bounds for the owner specified."
-        );
-        
-        return _schemaToRights[schemaId][index];       
-    }
-        
-    function _isSafeToTransfer(address from, address to, uint256 tokenId, bytes memory _data) private returns (bool)
+    /**
+     * @notice Get the parent token of `tokenId` token.
+     * @param tokenId The child token
+     * @return parentId The Parent token found
+     */
+    function parentOf(
+        uint256 tokenId
+    )
+        public
+        view
+        virtual
+        override(ERC6150, IERC6150)
+        returns (uint256 parentId)
     {
-        if (to.isContract()) {
-            try IERC721Receiver(to).onERC721Received(msg.sender, from, tokenId, _data) returns (bytes4 retval) {
-                return retval == IERC721Receiver(to).onERC721Received.selector;
-            } catch (bytes memory reason) {
-                if (reason.length == 0) {
-                    revert("SignataRight: must only transfer to ERC721Receiver implementers when recipient is a smart contract.");
-                } else {
-                    assembly {
-                        revert(add(32, reason), mload(reason))
-                    }
-                }
-            }
-        } else {
-            return true;
+        _requireMinted(tokenId);
+        parentId = _parentOf[tokenId];
+    }
+
+    /**
+     * @notice Get the children tokens of `tokenId` token.
+     * @param tokenId The parent token
+     * @return childrenIds The array of children tokens
+     */
+    function childrenOf(
+        uint256 tokenId
+    )
+        public
+        view
+        virtual
+        override(ERC6150, IERC6150)
+        returns (uint256[] memory childrenIds)
+    {
+        if (tokenId > 0) {
+            _requireMinted(tokenId);
         }
+        childrenIds = _childrenOf[tokenId];
+    }
+
+    /**
+     * @notice Check the `tokenId` token if it is a root token.
+     * @param tokenId The token want to be checked
+     * @return Return `true` if it is a root token; if not, return `false`
+     */
+    function isRoot(
+        uint256 tokenId
+    ) public view virtual override(ERC6150, IERC6150) returns (bool) {
+        _requireMinted(tokenId);
+        return _parentOf[tokenId] == 0;
+    }
+
+    /**
+     * @notice Check the `tokenId` token if it is a leaf token.
+     * @param tokenId The token want to be checked
+     * @return Return `true` if it is a leaf token; if not, return `false`
+     */
+    function isLeaf(
+        uint256 tokenId
+    ) public view virtual override(ERC6150, IERC6150) returns (bool) {
+        _requireMinted(tokenId);
+        return _childrenOf[tokenId].length == 0;
     }
 }
