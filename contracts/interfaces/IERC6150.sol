@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: CC0-1.0
 pragma solidity ^0.8.0;
 
-import "../openzeppelin/contracts/token/ERC721/IERC721.sol";
-import "../openzeppelin/contracts/utils/introspection/IERC165.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 
 /**
  * @title ERC-6150 Hierarchical NFTs Token Standard
  * @dev See https://eips.ethereum.org/EIPS/eip-6150
  * Note: the ERC-165 identifier for this interface is 0x897e2c73.
  */
-interface IERC6150 is IERC721, IERC165 {
+interface IERC6150 is IERC165, IERC721 {
     /**
      * @notice Emitted when `tokenId` token under `parentId` is minted.
      * @param minter The address of minter
