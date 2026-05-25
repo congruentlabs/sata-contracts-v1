@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.16;
+pragma solidity ^0.8.20;
 
 import "./interfaces/ISignataIdentity.sol";
 import "./interfaces/ISignataRight.sol";
-import "./openzeppelin/contracts/access/Ownable.sol";
-import "./openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./tokens/IERC721Receiver.sol";
-import "./openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 contract PurchaseRight is Ownable, IERC721Receiver, ReentrancyGuard {
     string public name;

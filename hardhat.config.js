@@ -18,10 +18,7 @@ const accountsFor = (pk) => (pk ? [pk] : []);
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
   solidity: {
-    compilers: [
-      { version: '0.8.10' },
-      { version: '0.8.16' },
-    ],
+    version: '0.8.28',
     settings: {
       optimizer: {
         enabled: true,
