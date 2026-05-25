@@ -6,8 +6,9 @@ import "./interfaces/IERC6150Burnable.sol";
 
 abstract contract ERC6150Burnable is ERC6150, IERC6150Burnable {
     function safeBurn(uint256 tokenId) public virtual override {
+        address owner = _ownerOf(tokenId);
         require(
-            _isApprovedOrOwner(_msgSender(), tokenId),
+            _isAuthorized(owner, _msgSender(), tokenId),
             "ERC6150Burnable: caller is neither token owner nor approved"
         );
         _safeBurn(tokenId);

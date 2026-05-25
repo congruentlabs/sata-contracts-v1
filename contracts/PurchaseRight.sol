@@ -6,7 +6,7 @@ import "./interfaces/ISignataRight.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./tokens/IERC721Receiver.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 contract PurchaseRight is Ownable, IERC721Receiver, ReentrancyGuard {
     string public name;
@@ -30,7 +30,7 @@ contract PurchaseRight is Ownable, IERC721Receiver, ReentrancyGuard {
         IERC20 _paymentToken,
         ISignataRight _signataRight,
         string memory _name
-    ) {
+    ) Ownable(msg.sender) {
         paymentToken = _paymentToken;
         signataRight = _signataRight;
         name = _name;

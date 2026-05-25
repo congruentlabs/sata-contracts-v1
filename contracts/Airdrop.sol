@@ -10,7 +10,7 @@ contract SATAAirdropV1 is Ownable {
   IERC20 public immutable token;
   mapping (address => bool) public claimedAddresses;
 
-  constructor(address _token, uint256 _airdropAmount, uint256 _minBalance) {
+  constructor(address _token, uint256 _airdropAmount, uint256 _minBalance) Ownable(msg.sender) {
     token = IERC20(_token);
     airdropAmount = _airdropAmount;
     reqEthBalance = _minBalance;

@@ -38,7 +38,7 @@ contract SignataWrappedToken is Ownable {
         address _token,
         ISignataRight _signataRight,
         uint256 _schemaId
-    ) {
+    ) Ownable(msg.sender) {
         name = _name;
         symbol = _symbol;
         decimals = _decimals;

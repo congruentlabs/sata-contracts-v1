@@ -3,7 +3,6 @@
 pragma solidity ^0.8.20;
 
 import "./ISignataIdentityV2.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
 
 /**
 Contract Overview
@@ -20,10 +19,9 @@ canDelegate: Specifies whether an address can delegate its permissions to anothe
 The contract provides functions to create, destroy, lock, and unlock identities. It also allows adding and removing delegates who can perform actions on behalf of the identity.
 */
 contract SignataIdentityV2 is ISignataIdentityV2 {
-    using Counters for Counters.Counter;
     uint256 internal constant MAX_UINT256 = type(uint256).max;
     // storage
-    mapping(address => Counters.Counter) public identityLockCount;
+    mapping(address => uint256) public identityLockCount;
     mapping(address => bool) public identityDestroyed;
     mapping(address => bool) public identityExists;
     mapping(address => bool) public identityLocked;
@@ -128,7 +126,7 @@ contract SignataIdentityV2 is ISignataIdentityV2 {
         );
 
         identityLocked[identity] = true;
-        identityLockCount[identity].increment();
+        identityLockCount[identity] += 1;
 
         emit Lock(identity, msg.sender);
     }
@@ -149,7 +147,7 @@ contract SignataIdentityV2 is ISignataIdentityV2 {
         );
 
         require(
-            identityLockCount[identity].current() != MAX_UINT256,
+            identityLockCount[identity] != MAX_UINT256,
             "SignataIdentityV2: The identity is permanently locked."
         );
 

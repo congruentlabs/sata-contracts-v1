@@ -6,7 +6,7 @@ import "./SignataRight.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./tokens/IERC721Receiver.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 contract ClaimRightAllowlist is Ownable, IERC721Receiver, ReentrancyGuard {
     string public name;
@@ -30,7 +30,7 @@ contract ClaimRightAllowlist is Ownable, IERC721Receiver, ReentrancyGuard {
         address _signataIdentity,
         string memory _name,
         address[] memory _allowlist
-    ) {
+    ) Ownable(msg.sender) {
         signataRight = SignataRight(_signataRight);
         signataIdentity = SignataIdentity(_signataIdentity);
         name = _name;

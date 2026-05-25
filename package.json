@@ -25,7 +25,7 @@
   "homepage": "https://github.com/congruentlabs/sata-contracts-v1#readme",
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
-    "@openzeppelin/contracts": "^4.9.6",
+    "@openzeppelin/contracts": "^5.4.0",
     "@openzeppelin/hardhat-upgrades": "^3.6.0",
     "dotenv": "^16.4.5",
     "hardhat": "^2.22.17"

@@ -25,10 +25,10 @@ contract SignataIdentityNano is AccessControl {
   
     constructor(address identityToken) {
         _identityToken = IERC20(identityToken);
-        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
-        _setupRole(DELEGATE_ROLE, msg.sender);
+        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _grantRole(DELEGATE_ROLE, msg.sender);
         _setRoleAdmin(DELEGATE_ROLE, DEFAULT_ADMIN_ROLE);
-        _setupRole(MODIFIER_ROLE, msg.sender);
+        _grantRole(MODIFIER_ROLE, msg.sender);
         _setRoleAdmin(MODIFIER_ROLE, DEFAULT_ADMIN_ROLE);
     }
 

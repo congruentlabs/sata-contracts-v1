@@ -3,7 +3,7 @@ pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "./interfaces/ISignataRight.sol";
 import "./interfaces/ISignataIdentity.sol";
 import "./ClaimRight.sol";
@@ -60,7 +60,7 @@ contract VeriswapERC20 is Ownable, ReentrancyGuard {
         ISignataRight _signataRight,
         ClaimRight _kycClaimRight,
         address _sanctionsContract
-    ) {
+    ) Ownable(msg.sender) {
         signataIdentity = _signataIdentity;
         signataRight = _signataRight;
         claimRight = _kycClaimRight;

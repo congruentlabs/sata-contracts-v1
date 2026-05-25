@@ -39,7 +39,7 @@ abstract contract ERC6150AccessControl is ERC6150, IERC6150AccessControl {
 
     function _addAdmin(address admin, uint256 tokenId) internal virtual {
         require(admin != address(0), "zero address");
-        require(_exists(tokenId), "tokenId doesn't exist");
+        require(_ownerOf(tokenId) != address(0), "tokenId doesn't exist");
         _isAdminOf[admin][tokenId] = true;
     }
 

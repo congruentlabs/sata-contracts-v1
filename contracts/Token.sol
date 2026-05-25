@@ -17,6 +17,7 @@ contract Token is ERC20, Ownable {
     uint256 remainderAmount
   )
     ERC20(name_, symbol_)
+    Ownable(msg.sender)
   {
     // allocate the reserves
     _mint(reserveAddress, reserveAmount);

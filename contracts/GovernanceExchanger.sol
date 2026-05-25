@@ -13,7 +13,7 @@ contract GovernanceExchanger is Ownable {
     // This event is triggered whenever a call to #exchange succeeds.
     event Exchanged(address account, uint256 amount);
 
-    constructor(address governanceToken_, address utilityToken_, address holdingAccount_) {
+    constructor(address governanceToken_, address utilityToken_, address holdingAccount_) Ownable(msg.sender) {
         governanceToken = governanceToken_;
         utilityToken = utilityToken_;
         holdingAccount = holdingAccount_;

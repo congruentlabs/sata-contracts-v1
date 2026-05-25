@@ -30,18 +30,15 @@ contract RegulatedAUD is ERC20, ERC20Burnable, AccessControl {
         _mint(to, amount);
     }
 
-    function _beforeTokenTransfer(
-        address from,
-        address to,
-        uint256 amount
-    ) internal override(ERC20) {
-        // both parties must hold a specifc NFT type
-        require(
-            signataRight.holdsTokenOfSchema(from, schemaId) &&
-                signataRight.holdsTokenOfSchema(to, schemaId),
-            "RegulatedAUD: transfer not allowed"
-        );
-        super._beforeTokenTransfer(from, to, amount);
+    function _update(address from, address to, uint256 value) internal override {
+        if (from != address(0) && to != address(0)) {
+            require(
+                signataRight.holdsTokenOfSchema(from, schemaId) &&
+                    signataRight.holdsTokenOfSchema(to, schemaId),
+                "RegulatedAUD: transfer not allowed"
+            );
+        }
+        super._update(from, to, value);
     }
 
     function updateSignataRight(ISignataRight _signataRight)

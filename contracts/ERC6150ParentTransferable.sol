@@ -13,12 +13,12 @@ abstract contract ERC6150ParentTransferable is
         uint256 tokenId
     ) public virtual override {
         require(
-            _isApprovedOrOwner(_msgSender(), tokenId),
+            _isAuthorized(_ownerOf(tokenId), _msgSender(), tokenId),
             "ERC6150ParentTransferable: caller is not token owner nor approved"
         );
         if (newParentId != 0) {
             require(
-                _exists(newParentId),
+                _ownerOf(newParentId) != address(0),
                 "ERC6150ParentTransferable: newParentId doesn't exists"
             );
         }

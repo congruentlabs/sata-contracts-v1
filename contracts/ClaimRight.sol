@@ -4,7 +4,7 @@ pragma solidity ^0.8.20;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./tokens/IERC721Receiver.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "./interfaces/ISignataRight.sol";
 
 contract ClaimRight is Ownable, IERC721Receiver, ReentrancyGuard {
@@ -46,7 +46,7 @@ contract ClaimRight is Ownable, IERC721Receiver, ReentrancyGuard {
         ISignataRight _signataRight,
         address _signingAuthority,
         string memory _name
-    ) {
+    ) Ownable(msg.sender) {
         paymentToken = _signataToken;
         signataRight = _signataRight;
         signingAuthority = _signingAuthority;
