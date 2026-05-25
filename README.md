@@ -57,6 +57,8 @@ imports:
 | `contracts/SignataNFTDrop.sol.wip` | references undefined `schemaId` (should be `dropData.schemaId`); empty claim body |
 | `contracts/ClaimERC721.sol.wip` | depends on commented-out `TWBitMaps` library import |
 | `contracts/swap/ISwap.sol.wip` | references undefined `Types.Order` / `TransferHandlerRegistry`; not imported anywhere |
+| `contracts/ERC6150*.sol.wip` + `interfaces/IERC6150*.sol.wip` | ERC-6150 hierarchical-NFT base contracts. Compile cleanly, but the only consumer was SignataRightV2 (also `.wip`). Parked together so they can be revived as a unit if/when V2 lands. |
+| `contracts/SignataIdentityV2.sol.wip` + `ISignataIdentityV2.sol.wip` | Same situation — only consumer was SignataRightV2 (`.wip`). |
 | `scripts/deploy_veriswap_v1.js.wip` | references undefined `_protocolFeeWallet` / `_stakingToken`, wrong contract name |
 
 These are kept in the tree (with `.wip` so the compiler ignores them) for
