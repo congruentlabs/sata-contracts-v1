@@ -1,28 +1,25 @@
-const { BN } = require("@openzeppelin/test-helpers");
+const hre = require('hardhat');
 
-const twentyMil          = "20000000000000000000000000";
-const fortyMil           = "40000000000000000000000000";
+const TWENTY_MIL = 20_000_000n * 10n ** 18n;
+const FORTY_MIL = 40_000_000n * 10n ** 18n;
 
 const main = async () => {
-  const [ deployer ] = await ethers.getAccounts();
+  const [deployer] = await hre.ethers.getSigners();
 
-  const SignataToken = await ethers.getContractFactory("Token");
+  const Token = await hre.ethers.getContractFactory('Token');
 
-  // originally we deployed this with the airdrop too, but we don't need to deploy that contract ever again.
-  // we also deployed with multiple addresses for the allocations, but for future testnet deployments
-  // we just mint everything to the deployer. We also deploy the full 100 mil tokens instead of the airdrop
-  // having 10 mil separately.
-  const signataIdentity = await SignataToken.deploy([
-    "Signata",
-    "SATA",
+  // For testnet we mint everything to the deployer (40M reserve + 20M integration + 40M remainder).
+  const token = await Token.deploy(
+    'Signata',
+    'SATA',
     deployer.address,
-    new BN(fortyMil),
+    FORTY_MIL,
     deployer.address,
-    new BN(twentyMil),
-    new BN(fortyMil)
-  ]);
-  
-  await signataIdentity.deployed();
+    TWENTY_MIL,
+    FORTY_MIL,
+  );
+  await token.waitForDeployment();
+  console.log('Token:', await token.getAddress());
 };
 
 main()

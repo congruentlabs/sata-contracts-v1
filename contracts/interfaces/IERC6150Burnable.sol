@@ -1,21 +1,21 @@
 // SPDX-License-Identifier: CC0-1.0
 pragma solidity ^0.8.0;
 
-import "./ERC6150.sol";
-import "./interfaces/IERC6150Burnable.sol";
+import "./IERC6150.sol";
 
-abstract contract ERC6150Burnable is ERC6150, IERC6150Burnable {
-    function safeBurn(uint256 tokenId) public virtual override {
-        require(
-            _isApprovedOrOwner(_msgSender(), tokenId),
-            "ERC6150Burnable: caller is neither token owner nor approved"
-        );
-        _safeBurn(tokenId);
-    }
+// Note: the ERC-165 identifier for this interface is 0x4ac0aa46.
+interface IERC6150Burnable is IERC6150 {
+    /**
+     * @notice Burn the `tokenId` token.
+     * @dev Throws if the caller is not owner or approved.
+     * @param tokenId The token to be burnt.
+     */
+    function safeBurn(uint256 tokenId) external;
 
-    function safeBatchBurn(uint256[] memory tokenIds) public virtual override {
-        for (uint256 i = 0; i < tokenIds.length; i++) {
-            safeBurn(tokenIds[i]);
-        }
-    }
+    /**
+     * @notice Batch burn tokens.
+     * @dev Throws if the caller is not owner or approved for any token.
+     * @param tokenIds The tokens to be burnt.
+     */
+    function safeBatchBurn(uint256[] memory tokenIds) external;
 }
