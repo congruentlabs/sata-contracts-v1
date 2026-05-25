@@ -3,6 +3,9 @@
   "version": "0.0.2",
   "description": "Solidity Smart Contracts for the Signata Project",
   "main": "index.js",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "analyze": "slither .",
     "test": "mocha --exit --recursive",

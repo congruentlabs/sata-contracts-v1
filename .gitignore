@@ -50,6 +50,16 @@ Thumbs.db
 
 .secret
 .secret-test
+.secret-bsc
 .urls.json
+.env
+.env.local
 
 .deps/
+
+# Hardhat
+cache/
+artifacts/
+typechain-types/
+coverage/
+coverage.json
